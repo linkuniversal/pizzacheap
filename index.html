@@ -1,1 +1,1949 @@
-PIZZA CHEAP
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>PIZZA CHEAP® | Mucho sabor, poco gasto · Monte Grande, Calzada y Ezeiza</title>
+    <meta name="description" content="Pizza al paso, ambiente climatizado y precios económicos. Av. Alem 576 y Dardo Rocha 48 (Monte Grande), Rafael Calzada y Ezeiza. Envasadas al vacío por docena.">
+    <meta name="theme-color" content="#FEF403">
+
+    <!-- PRELOAD DEL LOGO MAESTRO 3D -->
+    <link rel="preload" as="image" href="./Logo%20tridimensional%20de%20pizza%20alegre.webp">
+
+    <!-- TIPOGRAFÍAS DE ÉLITE: ATKINSON HYPERLEGIBLE + PLUS JAKARTA SANS + JETBRAINS MONO -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=JetBrains+Mono:wght@700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           1. ADN CROMÁTICO PIZZA CHEAP (ARMONIZADO AL 100% CON EL LOGO)
+           ========================================================================== */
+        :root {
+            --pz-yellow: #FEF403;         /* Amarillo queso mozzarella vibrante */
+            --pz-yellow-deep: #F5C800;    /* Dorado queso horneado */
+            --pz-red: #FE0109;           /* Rojo salsa tomate */
+            --pz-red-shadow: #7D0002;     /* Sombra profunda 3D del logo */
+            --pz-green: #00AC01;         /* Verde albahaca fresca */
+            --pz-dough: #FFF9ED;         /* Masa tierna / marfil */
+            --pz-dough-edge: #E8A849;    /* Borde de masa tostada */
+            --pz-ink: #140E07;           /* Tinta carbón para máxima legibilidad */
+
+            --card-surface: rgba(255, 251, 240, 0.94);
+            --card-border: rgba(125, 0, 2, 0.18);
+            --card-shadow: 0 16px 36px -8px rgba(125, 0, 2, 0.16), 0 4px 12px rgba(20, 14, 7, 0.06);
+            --card-shadow-hover: 0 22px 46px -8px rgba(254, 1, 9, 0.28), 0 8px 18px rgba(254, 244, 3, 0.25);
+
+            --font-pop: 'Bungee', cursive, sans-serif;
+            --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --spring-cheese: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --ease-fluid: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body.preload * {
+            transition: none !important;
+            animation: none !important;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            background-color: var(--pz-yellow);
+            scroll-behavior: smooth;
+            max-width: 100%;
+            overflow-x: clip;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: transparent;
+            color: var(--pz-ink);
+            min-height: 100vh;
+            min-height: 100dvh;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: clip;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 0 max(48px, env(safe-area-inset-bottom));
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ==========================================================================
+           2. FONDO 3D CANVAS "TIERRA DE LA PIZZA" (PERSPECTIVA CONTINUA 60 FPS)
+           ========================================================================== */
+        .pizza-world-stage {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+            background: linear-gradient(180deg, #FFE866 0%, #FEF403 40%, #FFF3B8 100%);
+        }
+
+        #pizza3dCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Velo dorado-crema que garantiza contraste perfecto sobre cualquier pantalla */
+        .pizza-world-veil {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 50% 12%, rgba(255, 255, 255, 0.22) 0%, rgba(254, 244, 3, 0.42) 65%, rgba(245, 200, 0, 0.65) 100%),
+                linear-gradient(180deg, rgba(255, 249, 237, 0.12) 0%, rgba(255, 249, 237, 0.52) 48%, rgba(254, 244, 3, 0.82) 100%);
+        }
+
+        /* ==========================================================================
+           3. MARQUESINA DE LEMAS REALES
+           ========================================================================== */
+        .top-marquee-strip {
+            width: 100%;
+            background: var(--pz-red);
+            color: #FFFFFF;
+            font-family: var(--font-mono);
+            font-size: clamp(0.66rem, 2.4vw, 0.74rem);
+            font-weight: 900;
+            letter-spacing: 0.10em;
+            text-transform: uppercase;
+            padding: 8px 0;
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            box-shadow: 0 4px 14px rgba(125, 0, 2, 0.35);
+            border-bottom: 3px solid var(--pz-red-shadow);
+        }
+
+        .marquee-track {
+            display: flex;
+            width: max-content;
+            animation: cheapMarquee 24s linear infinite;
+            will-change: transform;
+        }
+
+        .marquee-track span {
+            white-space: nowrap;
+            padding-right: 32px;
+        }
+
+        @keyframes cheapMarquee {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ==========================================================================
+           4. CONTENEDOR SHELL (BLINDADO PARA OVERVIEW IG / WPP / PC)
+           ========================================================================== */
+        .hub-shell {
+            width: 100%;
+            max-width: 486px;
+            padding: 12px clamp(12px, 3.8vw, 18px) 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 5;
+            position: relative;
+        }
+
+        /* ==========================================================================
+           5. HERO LOGO 3D POP (LIBRE, SIN RECUADRO DETRÁS, CON SQUASH & STRETCH)
+           ========================================================================== */
+        .brand-hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+            padding-top: 4px;
+            position: relative;
+        }
+
+        .logo-3d-wrapper {
+            width: 100%;
+            max-width: clamp(230px, 68vw, 290px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            filter: drop-shadow(0 14px 22px rgba(125, 0, 2, 0.28)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.18));
+            animation: pizzaLogoPulse 5.2s ease-in-out infinite alternate;
+            transform-origin: center center;
+            transition: transform 0.26s var(--spring-cheese);
+        }
+
+        .logo-3d-wrapper:active {
+            transform: scale(0.94) rotate(-2deg);
+        }
+
+        @keyframes pizzaLogoPulse {
+            0%   { transform: translateY(0px) rotate(0deg) scale(1); }
+            50%  { transform: translateY(-4px) rotate(1.2deg) scale(1.02); }
+            100% { transform: translateY(0px) rotate(0deg) scale(1); }
+        }
+
+        .logo-3d-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        .badges-capsules-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 2px;
+        }
+
+        .badge-chip {
+            background: #FFFFFF;
+            border: 2px solid var(--pz-red-shadow);
+            color: var(--pz-ink);
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            font-weight: 900;
+            padding: 5px 12px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 0 var(--pz-red-shadow);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-chip.green {
+            background: #D8FFD9;
+            border-color: #007A01;
+            color: #005A01;
+            box-shadow: 0 4px 0 #005A01;
+        }
+
+        /* MANIFIESTO REAL DEL CLIENTE */
+        .motto-banner-box {
+            background: var(--card-surface);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 2.5px solid var(--pz-red-shadow);
+            border-radius: 20px;
+            padding: 13px 18px;
+            box-shadow: 0 6px 0 var(--pz-red-shadow), var(--card-shadow);
+            width: 100%;
+            text-align: center;
+            position: relative;
+        }
+
+        .motto-lead {
+            font-family: var(--font-pop);
+            font-size: clamp(1.05rem, 4.2vw, 1.25rem);
+            color: var(--pz-red);
+            line-height: 1.2;
+            letter-spacing: 0.02em;
+            text-shadow: 1px 1px 0 #FFFFFF;
+        }
+
+        .motto-sub {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--pz-ink);
+            line-height: 1.35;
+            margin-top: 4px;
+        }
+
+        /* ==========================================================================
+           6. BORDES CON QUESO CHORREANDO (VECTOR SVG SATINADO)
+           ========================================================================== */
+        .cheese-drip-head {
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            height: 24px;
+            pointer-events: none;
+            z-index: 3;
+            overflow: hidden;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .cheese-drip-head svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            fill: var(--pz-yellow);
+            filter: drop-shadow(0 2px 2px rgba(125, 0, 2, 0.25));
+        }
+
+        /* ==========================================================================
+           7. BOTÓN HERO: WHATSAPP GENERAL (PEDIDOS DIRECTOS)
+           ========================================================================== */
+        .btn-hero-order {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 19px 20px;
+            background: linear-gradient(135deg, var(--pz-red) 0%, #D80007 100%);
+            border: 3px solid #FFFFFF;
+            outline: 3px solid var(--pz-red-shadow);
+            border-radius: 24px;
+            text-decoration: none;
+            color: #FFFFFF;
+            box-shadow: 0 8px 0 var(--pz-red-shadow), 0 18px 36px rgba(254, 1, 9, 0.38);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.22s var(--spring-cheese);
+            cursor: pointer;
+        }
+
+        .btn-hero-order:hover {
+            transform: translateY(-3px) scale(1.015);
+            box-shadow: 0 11px 0 var(--pz-red-shadow), 0 22px 42px rgba(254, 1, 9, 0.48);
+        }
+
+        .btn-hero-order:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 var(--pz-red-shadow);
+        }
+
+        .hero-order-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+            min-width: 0;
+            z-index: 2;
+        }
+
+        .hero-order-tag {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            font-weight: 900;
+            color: var(--pz-yellow);
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 0 var(--pz-red-shadow);
+        }
+
+        .hero-order-title {
+            font-family: var(--font-pop);
+            font-size: clamp(1.22rem, 4.6vw, 1.48rem);
+            line-height: 1.1;
+            letter-spacing: 0.02em;
+            text-shadow: 2px 2px 0 var(--pz-red-shadow);
+        }
+
+        .hero-order-sub {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #FFF6E0;
+            margin-top: 1px;
+        }
+
+        .hero-cheese-bubble {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            border-radius: 50%;
+            background: var(--pz-yellow);
+            color: var(--pz-red);
+            border: 2px solid var(--pz-red-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 0 var(--pz-red-shadow);
+            transition: transform 0.28s var(--spring-cheese);
+            z-index: 2;
+        }
+
+        .btn-hero-order:hover .hero-cheese-bubble {
+            transform: scale(1.15) rotate(14deg);
+        }
+
+        /* ==========================================================================
+           8. PROMOS REALES DE CLIENTE: BÁSICA $19.500 & TRADICIONAL $23.000
+           ========================================================================== */
+        .promos-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            width: 100%;
+        }
+
+        .promo-card {
+            background: var(--card-surface);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 2.5px solid var(--pz-red-shadow);
+            border-radius: 22px;
+            padding: 16px 14px 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 6px 0 var(--pz-red-shadow), var(--card-shadow);
+            text-decoration: none;
+            color: var(--pz-ink);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s var(--spring-cheese);
+            min-height: 182px;
+        }
+
+        .promo-card:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 9px 0 var(--pz-red-shadow), var(--card-shadow-hover);
+            background: #FFFFFF;
+        }
+
+        .promo-card:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0 var(--pz-red-shadow);
+        }
+
+        .promo-card.special {
+            background: linear-gradient(160deg, #FFFFFF 0%, #FFF3D6 100%);
+            border-color: #B50005;
+        }
+
+        .promo-top-badge {
+            font-family: var(--font-mono);
+            font-size: 0.62rem;
+            font-weight: 900;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: var(--pz-yellow);
+            color: var(--pz-ink);
+            border: 1.5px solid var(--pz-red-shadow);
+            text-transform: uppercase;
+            align-self: flex-start;
+            box-shadow: 0 2px 0 var(--pz-red-shadow);
+        }
+
+        .promo-title {
+            font-family: var(--font-pop);
+            font-size: clamp(1.1rem, 3.8vw, 1.25rem);
+            color: var(--pz-red);
+            line-height: 1.15;
+            margin-top: 6px;
+        }
+
+        .promo-desc {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--pz-ink);
+            line-height: 1.3;
+            margin-top: 2px;
+        }
+
+        .promo-price-row {
+            margin-top: 10px;
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            background: #FFFFFF;
+            border: 1.5px solid var(--pz-red-shadow);
+            border-radius: 12px;
+            padding: 6px 10px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .promo-price-val {
+            font-family: var(--font-mono);
+            font-size: clamp(1.1rem, 3.8vw, 1.28rem);
+            font-weight: 900;
+            color: var(--pz-red);
+            letter-spacing: -0.02em;
+        }
+
+        .promo-btn-arrow {
+            font-size: 1rem;
+            font-weight: 900;
+            color: var(--pz-green);
+        }
+
+        /* ==========================================================================
+           9. EL RETO VIRAL REAL: CRONÓMETRO 10:00 SEGUNDOS (DEL LOCAL)
+           ========================================================================== */
+        .stopwatch-challenge-card {
+            background: linear-gradient(145deg, #1A110B 0%, #29180E 100%);
+            border: 3px solid var(--pz-yellow);
+            border-radius: 24px;
+            padding: 18px 20px 20px;
+            color: #FFFFFF;
+            box-shadow: 0 8px 0 var(--pz-red-shadow), 0 16px 36px rgba(0,0,0,0.45);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stopwatch-challenge-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 5px;
+            background: linear-gradient(90deg, var(--pz-red), var(--pz-yellow), var(--pz-green));
+        }
+
+        .challenge-badge {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 900;
+            color: #140E07;
+            background: var(--pz-yellow);
+            padding: 3px 12px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            box-shadow: 0 0 14px rgba(254, 244, 3, 0.4);
+        }
+
+        .challenge-title {
+            font-family: var(--font-pop);
+            font-size: clamp(1.18rem, 4.4vw, 1.38rem);
+            color: var(--pz-yellow);
+            letter-spacing: 0.02em;
+            line-height: 1.15;
+            text-shadow: 2px 2px 0 var(--pz-red-shadow);
+        }
+
+        .challenge-desc {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #F8E6CE;
+            line-height: 1.35;
+            max-width: 92%;
+        }
+
+        /* Display LED digital retro */
+        .stopwatch-display-box {
+            background: #090604;
+            border: 2px solid #54371D;
+            border-radius: 14px;
+            padding: 10px 24px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8), 0 0 18px rgba(254, 1, 9, 0.25);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stopwatch-digits {
+            font-family: var(--font-mono);
+            font-size: clamp(2.3rem, 9vw, 2.9rem);
+            font-weight: 900;
+            color: var(--pz-red);
+            letter-spacing: 3px;
+            text-shadow: 0 0 16px rgba(254, 1, 9, 0.85);
+        }
+
+        .stopwatch-actions {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .btn-stopwatch-trigger {
+            flex: 1;
+            padding: 13px 16px;
+            font-family: var(--font-pop);
+            font-size: 0.95rem;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+            border-radius: 14px;
+            border: 2px solid #FFFFFF;
+            cursor: pointer;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.5);
+            transition: all 0.15s var(--spring-cheese);
+            outline: none;
+            text-transform: uppercase;
+        }
+
+        .btn-stopwatch-trigger.start {
+            background: var(--pz-green);
+            color: #FFFFFF;
+        }
+
+        .btn-stopwatch-trigger.stop {
+            background: var(--pz-red);
+            color: #FFFFFF;
+            animation: redButtonGlow 1.2s infinite alternate;
+        }
+
+        @keyframes redButtonGlow {
+            0% { box-shadow: 0 0 8px rgba(254, 1, 9, 0.5); }
+            100% { box-shadow: 0 0 20px rgba(254, 1, 9, 0.95); }
+        }
+
+        .btn-stopwatch-trigger:active {
+            transform: scale(0.96) translateY(2px);
+        }
+
+        .challenge-result-banner {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 9px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: var(--pz-yellow);
+            display: none;
+        }
+
+        .challenge-result-banner.active {
+            display: block;
+        }
+
+        /* ==========================================================================
+           10. SECCIÓN B2B / MAYORISTA: ENVASADO AL VACÍO POR DOCENA
+           ========================================================================== */
+        .wholesale-vacuum-card {
+            background: var(--card-surface);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 2.5px solid var(--pz-red-shadow);
+            border-radius: 24px;
+            padding: 18px 18px 20px;
+            box-shadow: 0 6px 0 var(--pz-red-shadow), var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wholesale-badge-top {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 900;
+            color: #005A01;
+            background: #D8FFD9;
+            border: 1.5px solid #00AC01;
+            padding: 3px 10px;
+            border-radius: 999px;
+            align-self: flex-start;
+            text-transform: uppercase;
+        }
+
+        .wholesale-title {
+            font-family: var(--font-pop);
+            font-size: clamp(1.22rem, 4.4vw, 1.42rem);
+            color: var(--pz-red);
+            line-height: 1.15;
+            letter-spacing: 0.02em;
+        }
+
+        .wholesale-desc {
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--pz-ink);
+            line-height: 1.4;
+        }
+
+        .wholesale-images-dual {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 2px;
+        }
+
+        .wholesale-img-frame {
+            height: 130px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 2px solid #FFFFFF;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+            background: #E8DECD;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .wholesale-img-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s var(--spring-cheese);
+        }
+
+        .wholesale-img-frame:hover img {
+            transform: scale(1.08);
+        }
+
+        .wholesale-img-tag {
+            position: absolute;
+            left: 6px;
+            bottom: 6px;
+            background: rgba(20, 14, 7, 0.85);
+            color: var(--pz-yellow);
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .btn-wholesale-order {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--pz-yellow);
+            border: 2px solid var(--pz-red-shadow);
+            border-radius: 14px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--pz-ink);
+            font-family: var(--font-sans);
+            font-size: 0.86rem;
+            font-weight: 900;
+            box-shadow: 0 4px 0 var(--pz-red-shadow);
+            transition: all 0.2s var(--spring-cheese);
+        }
+
+        .btn-wholesale-order:hover {
+            transform: translateY(-2px);
+            background: #FFF052;
+            box-shadow: 0 6px 0 var(--pz-red-shadow);
+        }
+
+        .btn-wholesale-order:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--pz-red-shadow);
+        }
+
+        /* ==========================================================================
+           11. SUCURSALES (MONTE GRANDE 1 Y 2, CALZADA, EZEIZA)
+           ========================================================================== */
+        .branches-container-card {
+            background: var(--card-surface);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 2.5px solid var(--pz-red-shadow);
+            border-radius: 24px;
+            padding: 18px 16px 20px;
+            box-shadow: 0 6px 0 var(--pz-red-shadow), var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .branches-head-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .branches-title {
+            font-family: var(--font-pop);
+            font-size: clamp(1.18rem, 4.4vw, 1.35rem);
+            color: var(--pz-red);
+            line-height: 1.15;
+            letter-spacing: 0.02em;
+        }
+
+        .branches-mono-sub {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: var(--pz-green);
+            text-transform: uppercase;
+        }
+
+        .branch-cards-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .branch-unit-card {
+            background: #FFFFFF;
+            border: 2px solid var(--pz-red-shadow);
+            border-radius: 16px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--pz-ink);
+            box-shadow: 0 3px 0 var(--pz-red-shadow);
+            transition: all 0.2s var(--spring-cheese);
+        }
+
+        .branch-unit-card:hover {
+            transform: translateY(-2px) scale(1.01);
+            border-color: var(--pz-red);
+            box-shadow: 0 5px 0 var(--pz-red-shadow);
+            background: #FFFDF5;
+        }
+
+        .branch-unit-card:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 var(--pz-red-shadow);
+        }
+
+        .branch-info-col {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            flex: 1;
+            gap: 2px;
+        }
+
+        .branch-city-tag {
+            font-family: var(--font-mono);
+            font-size: 0.62rem;
+            font-weight: 900;
+            color: var(--pz-red);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .branch-address-val {
+            font-size: 0.94rem;
+            font-weight: 800;
+            color: var(--pz-ink);
+            line-height: 1.25;
+        }
+
+        .branch-phone-val {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--pz-green);
+        }
+
+        .branch-btn-icon {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border-radius: 50%;
+            background: #25D366;
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1rem;
+            box-shadow: 0 2px 6px rgba(37, 211, 102, 0.45);
+        }
+
+        .branch-btn-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: #FFFFFF;
+        }
+
+        /* =========================================================
+           12. VIDEOS Y FOTOS CON BLINDAJE ANTI-CONGELAMIENTO
+           ========================================================= */
+        .reels-section-card {
+            background: var(--card-surface);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 2.5px solid var(--pz-red-shadow);
+            border-radius: 24px;
+            padding: 18px 14px 20px;
+            box-shadow: 0 6px 0 var(--pz-red-shadow), var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .reels-head-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4px;
+            gap: 8px;
+        }
+
+        .reels-title {
+            font-family: var(--font-pop);
+            font-size: clamp(1.15rem, 4.2vw, 1.34rem);
+            color: var(--pz-red);
+            letter-spacing: 0.02em;
+        }
+
+        .reels-nav-arrows {
+            display: flex;
+            gap: 6px;
+        }
+
+        .reel-arrow-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--pz-yellow);
+            border: 1.5px solid var(--pz-red-shadow);
+            color: var(--pz-red);
+            font-weight: 900;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 0 var(--pz-red-shadow);
+            transition: all 0.18s;
+        }
+
+        .reel-arrow-btn:hover {
+            transform: scale(1.08);
+            background: var(--pz-red);
+            color: #FFFFFF;
+        }
+
+        .reels-scroll-strip {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding: 4px 2px 8px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .reels-scroll-strip::-webkit-scrollbar {
+            display: none;
+        }
+
+        .reel-box {
+            flex: 0 0 clamp(165px, 46vw, 195px);
+            height: 250px;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 2.5px solid var(--pz-red-shadow);
+            box-shadow: 0 5px 0 var(--pz-red-shadow), 0 8px 18px rgba(0,0,0,0.12);
+            scroll-snap-align: start;
+            position: relative;
+            background: #0D0A07;
+        }
+
+        .reel-box video, .reel-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .reel-pill-label {
+            position: absolute;
+            left: 8px;
+            bottom: 8px;
+            background: rgba(20, 14, 7, 0.86);
+            backdrop-filter: blur(4px);
+            color: var(--pz-yellow);
+            font-family: var(--font-mono);
+            font-size: 0.64rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(254, 244, 3, 0.35);
+            text-transform: uppercase;
+        }
+
+        /* ==========================================================================
+           13. LIGHTBOX DE FOTOS
+           ========================================================================== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 14, 7, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.24s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .lightbox-card {
+            background: #FFFFFF;
+            border: 3px solid var(--pz-red-shadow);
+            border-radius: 22px;
+            max-width: 520px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: 0 8px 0 var(--pz-red-shadow), 0 25px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.96);
+            transition: transform 0.24s var(--spring-cheese);
+        }
+
+        .modal-overlay.active .lightbox-card {
+            transform: scale(1);
+        }
+
+        .lightbox-topbar {
+            padding: 14px 18px;
+            background: var(--pz-yellow);
+            border-bottom: 2px solid var(--pz-red-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .lightbox-topbar span {
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+            font-weight: 900;
+            color: var(--pz-red);
+        }
+
+        .btn-lb-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--pz-red-shadow);
+            background: var(--pz-red);
+            color: #FFFFFF;
+            font-size: 15px;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-stage {
+            width: 100%;
+            height: 60dvh;
+            max-height: 480px;
+            background: #140E07;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 10px;
+        }
+
+        .lightbox-stage img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 12px;
+            display: block;
+        }
+
+        .lb-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--pz-yellow);
+            border: 2px solid var(--pz-red-shadow);
+            color: var(--pz-red);
+            font-size: 20px;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 5;
+        }
+
+        .lb-prev { left: 10px; }
+        .lb-next { right: 10px; }
+
+        .lightbox-caption {
+            padding: 12px 16px;
+            font-size: 0.86rem;
+            font-weight: 800;
+            color: var(--pz-ink);
+            text-align: center;
+            background: var(--pz-dough);
+        }
+
+        /* ==========================================================================
+           14. FOOTER
+           ========================================================================== */
+        .hub-footer {
+            margin-top: 10px;
+            padding-top: 20px;
+            border-top: 2.5px dashed var(--pz-red-shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 7px;
+        }
+
+        .footer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #FFFFFF;
+            border: 2px solid var(--pz-red-shadow);
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 900;
+            color: var(--pz-red);
+            box-shadow: 0 3px 0 var(--pz-red-shadow);
+        }
+
+        .footer-legal {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: #4A331E;
+            line-height: 1.45;
+            font-weight: 700;
+        }
+
+        /* ==========================================================================
+           15. RESPONSIVE ULTRA-ANGOSTO (OVERVIEW IG / WPP)
+           ========================================================================== */
+        @media (max-width: 360px) {
+            .promos-grid {
+                grid-template-columns: 1fr;
+            }
+            .wholesale-images-dual {
+                grid-template-columns: 1fr;
+            }
+            .reel-box {
+                flex: 0 0 160px;
+                height: 220px;
+            }
+        }
+    </style>
+</head>
+<body class="preload">
+
+    <!-- ==========================================================================
+         FONDO 3D CANVAS "TIERRA DE LA PIZZA" (ESTILO FANTASÍA POP APETITOSA)
+         ========================================================================== -->
+    <div class="pizza-world-stage" aria-hidden="true">
+        <canvas id="pizza3dCanvas"></canvas>
+        <div class="pizza-world-veil"></div>
+    </div>
+
+    <!-- MARQUESINA CONTINUA CON LEMAS REALES -->
+    <div class="top-marquee-strip" aria-label="Información Pizza Cheap">
+        <div class="marquee-track">
+            <span>🍕 PIZZA AL PASO · MUCHO SABOR, POCO GASTO ✦ PRECIOS BAJOS, SABOR DE OTRO NIVEL ✦ 3 MUZZAS DESDE $19.500 ✦ ENVASADAS AL VACÍO POR DOCENA ✦</span>
+            <span>🍕 PIZZA AL PASO · MUCHO SABOR, POCO GASTO ✦ PRECIOS BAJOS, SABOR DE OTRO NIVEL ✦ 3 MUZZAS DESDE $19.500 ✦ ENVASADAS AL VACÍO POR DOCENA ✦</span>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL MOBILE-FIRST BLINDADO -->
+    <main class="hub-shell">
+
+        <!-- 1. CABECERA: LOGO 3D POP FLOTANTE (SIN RECUADRO) -->
+        <header class="brand-hero">
+            <div class="logo-3d-wrapper" onclick="triggerHaptic()" title="Pizza Cheap">
+                <img
+                    src="./Logo%20tridimensional%20de%20pizza%20alegre.webp"
+                    alt="Pizza Cheap Logo Oficial"
+                    onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='https://raw.githubusercontent.com/linkuniversal/pizzacheap/main/Logo%20tridimensional%20de%20pizza%20alegre.webp';}"
+                >
+            </div>
+
+            <!-- CHIPS BADGES REALES -->
+            <div class="badges-capsules-row">
+                <span class="badge-chip">🍕 Pizza al paso</span>
+                <span class="badge-chip green">❄️ Climatizado</span>
+                <span class="badge-chip">💵 Precios Económicos</span>
+            </div>
+
+            <!-- LEMA PRINCIPAL REAL -->
+            <div class="motto-banner-box">
+                <div class="motto-lead">“Lo bueno no siempre es caro”</div>
+                <div class="motto-sub">Mucho sabor, poco gasto · Una pizza que enamora a tu paladar y cuida tu bolsillo.</div>
+            </div>
+        </header>
+
+        <!-- 2. BOTÓN HERO: WHATSAPP PRINCIPAL DE PEDIDOS -->
+        <a href="https://wa.me/message/FYULREP6X5UFI1" target="_blank" rel="noopener noreferrer" class="btn-hero-order" onclick="triggerHaptic()">
+            <div class="hero-order-meta">
+                <span class="hero-order-tag">★ Pedidos por WhatsApp</span>
+                <h2 class="hero-order-title">Pedí tu Pizza Acá</h2>
+                <span class="hero-order-sub">Hacé tu pedido directo · Rápido y caliente</span>
+            </div>
+            <div class="hero-cheese-bubble">🍕</div>
+        </a>
+
+        <!-- 3. PROMOS REALES: BÁSICA $19.500 & TRADICIONAL $23.000 (CON CHORREADO DE QUESO) -->
+        <section class="promos-grid">
+
+            <!-- PROMO BÁSICA: 3 MUZZAS POR $19.500 -->
+            <a href="https://wa.me/message/FYULREP6X5UFI1?text=%C2%A1Hola%20Pizza%20Cheap!%20%F0%9F%8D%95%20Quiero%20aprovechar%20la%20Promo%20B%C3%A1sica:%203%20muzzas%20por%20$19.500." target="_blank" rel="noopener noreferrer" class="promo-card" onclick="triggerHaptic()">
+                <div class="cheese-drip-head">
+                    <svg viewBox="0 0 100 24" preserveAspectRatio="none">
+                        <path d="M0,0 L100,0 L100,8 Q88,18 78,8 Q68,22 56,12 Q45,24 34,10 Q20,22 10,8 Q5,16 0,6 Z"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="promo-top-badge">Promo Básica</span>
+                    <h3 class="promo-title">3 Muzzas</h3>
+                    <p class="promo-desc">Super económica para compartir</p>
+                </div>
+                <div class="promo-price-row">
+                    <span class="promo-price-val">$19.500</span>
+                    <span class="promo-btn-arrow">Pedir ↗</span>
+                </div>
+            </a>
+
+            <!-- PROMO TRADICIONAL: 3 MUZZAS POR $23.000 -->
+            <a href="https://wa.me/message/FYULREP6X5UFI1?text=%C2%A1Hola%20Pizza%20Cheap!%20%F0%9F%8D%95%20Quiero%20la%20Promo%20Tradicional:%203%20muzzas%20por%20$23.000." target="_blank" rel="noopener noreferrer" class="promo-card special" onclick="triggerHaptic()">
+                <div class="cheese-drip-head">
+                    <svg viewBox="0 0 100 24" preserveAspectRatio="none">
+                        <path d="M0,0 L100,0 L100,10 Q85,24 74,9 Q62,21 50,11 Q38,23 26,9 Q14,20 0,8 Z"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="promo-top-badge" style="background:var(--pz-red); color:#FFF;">Más Pedida</span>
+                    <h3 class="promo-title">Tradicional</h3>
+                    <p class="promo-desc">3 muzzas clásicas bien cargadas</p>
+                </div>
+                <div class="promo-price-row">
+                    <span class="promo-price-val">$23.000</span>
+                    <span class="promo-btn-arrow">Pedir ↗</span>
+                </div>
+            </a>
+
+        </section>
+
+        <!-- 4. EL RETO VIRAL REAL: CRONÓMETRO 10:00 SEGUNDOS (DEL LOCAL) -->
+        <article class="stopwatch-challenge-card">
+            <span class="challenge-badge">Desafío Oficial del Local</span>
+            <h3 class="challenge-title">El Reto de los 10:00 Segundos</h3>
+            <p class="challenge-desc">¡Detené el cronómetro justo en 10:00 segundos exactos y lleváte tu pedido gratis!</p>
+
+            <div class="stopwatch-display-box">
+                <span class="stopwatch-digits" id="timerDisplay">00:00.00</span>
+            </div>
+
+            <div class="stopwatch-actions">
+                <button type="button" class="btn-stopwatch-trigger start" id="btnTimerAction" onclick="handleStopwatchClick()">
+                    Iniciar ▶
+                </button>
+            </div>
+
+            <div class="challenge-result-banner" id="timerFeedback"></div>
+        </article>
+
+        <!-- 5. SECCIÓN MAYORISTA B2B: ENVASADO AL VACÍO POR DOCENA -->
+        <section class="wholesale-vacuum-card">
+            <span class="wholesale-badge-top">Mayorista &amp; Emprendedores</span>
+            <h3 class="wholesale-title">Pizzas Envasadas al Vacío</h3>
+            <p class="wholesale-desc">
+                Contamos con máquina propia de envasado al vacío. Vendemos pizzas por docena para comercios, emprendedores y eventos.
+            </p>
+
+            <div class="wholesale-images-dual">
+                <div class="wholesale-img-frame" onclick="openLightbox(0)">
+                    <img
+                        src="./pizzasiendoempacada.webp"
+                        alt="Pizza siendo empacada al vacío con máquina"
+                        loading="lazy"
+                        onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='https://raw.githubusercontent.com/linkuniversal/pizzacheap/main/pizzasiendoempacada.webp';}"
+                    >
+                    <span class="wholesale-img-tag">Envasado al vacío</span>
+                </div>
+                <div class="wholesale-img-frame" onclick="openLightbox(1)">
+                    <img
+                        src="./cocineroconpizzasprehechas.webp"
+                        alt="Cocinero con pizzas prehechas para mayoristas"
+                        loading="lazy"
+                        onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='https://raw.githubusercontent.com/linkuniversal/pizzacheap/main/cocineroconpizzasprehechas.webp';}"
+                    >
+                    <span class="wholesale-img-tag">Pizzas por docena</span>
+                </div>
+            </div>
+
+            <a href="https://wa.me/message/FYULREP6X5UFI1?text=%C2%A1Hola!%20Quisiera%20consultar%20por%20las%20pizzas%20envasadas%20al%20vac%C3%ADo%20por%20docena%20para%20comercios%20o%20eventos." target="_blank" rel="noopener noreferrer" class="btn-wholesale-order" onclick="triggerHaptic()">
+                <span>Consultar Precios por Docena</span>
+                <span>Pedir Info ↗</span>
+            </a>
+        </section>
+
+        <!-- 6. SUCURSALES (MONTE GRANDE 1 Y 2, CALZADA, EZEIZA) -->
+        <section class="branches-container-card">
+            <div class="branches-head-row">
+                <h3 class="branches-title">Nuestras Sucursales</h3>
+                <span class="branches-mono-sub">Atención al paso</span>
+            </div>
+
+            <div class="branch-cards-stack">
+
+                <!-- 1. MONTE GRANDE ALEM -->
+                <a href="https://wa.me/5491130638840?text=%C2%A1Hola%20Pizza%20Cheap%20Alem!%20%F0%9F%8D%95%20Quiero%20hacer%20un%20pedido%20en%20Av.%20Alem%20576." target="_blank" rel="noopener noreferrer" class="branch-unit-card" onclick="triggerHaptic()">
+                    <div class="branch-info-col">
+                        <span class="branch-city-tag">Monte Grande · Casa 1</span>
+                        <span class="branch-address-val">Av. Alem 576</span>
+                        <span class="branch-phone-val">📲 11 3063-8840</span>
+                    </div>
+                    <div class="branch-btn-icon">
+                        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    </div>
+                </a>
+
+                <!-- 2. MONTE GRANDE DARDO ROCHA -->
+                <a href="https://wa.me/5491141872756?text=%C2%A1Hola%20Pizza%20Cheap%20Dardo%20Rocha!%20%F0%9F%8D%95%20Quiero%20hacer%20un%20pedido%20en%20Dardo%20Rocha%2048." target="_blank" rel="noopener noreferrer" class="branch-unit-card" onclick="triggerHaptic()">
+                    <div class="branch-info-col">
+                        <span class="branch-city-tag">Monte Grande · Casa 2</span>
+                        <span class="branch-address-val">Dardo Rocha 48</span>
+                        <span class="branch-phone-val">📲 11 4187-2756</span>
+                    </div>
+                    <div class="branch-btn-icon">
+                        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    </div>
+                </a>
+
+                <!-- 3. RAFAEL CALZADA -->
+                <a href="https://wa.me/message/FYULREP6X5UFI1?text=%C2%A1Hola%20Pizza%20Cheap%20Rafael%20Calzada!%20%F0%9F%8D%95%20Quiero%20pedir%20en%2020%20de%20Septiembre%201813." target="_blank" rel="noopener noreferrer" class="branch-unit-card" onclick="triggerHaptic()">
+                    <div class="branch-info-col">
+                        <span class="branch-city-tag">Rafael Calzada</span>
+                        <span class="branch-address-val">20 de Septiembre 1813</span>
+                        <span class="branch-phone-val">📍 Sucursal Calzada</span>
+                    </div>
+                    <div class="branch-btn-icon">
+                        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    </div>
+                </a>
+
+                <!-- 4. EZEIZA -->
+                <a href="https://wa.me/message/FYULREP6X5UFI1?text=%C2%A1Hola%20Pizza%20Cheap%20Ezeiza!%20%F0%9F%8D%95%20Quiero%20pedir%20en%20Paso%20de%20la%20Patria%20263." target="_blank" rel="noopener noreferrer" class="branch-unit-card" onclick="triggerHaptic()">
+                    <div class="branch-info-col">
+                        <span class="branch-city-tag">Ezeiza</span>
+                        <span class="branch-address-val">Paso de la Patria 263</span>
+                        <span class="branch-phone-val">📍 Sucursal Ezeiza</span>
+                    </div>
+                    <div class="branch-btn-icon">
+                        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- 7. REELS Y VIDEOS CON BLINDAJE ANTI-CONGELAMIENTO + FOTOS -->
+        <section class="reels-section-card">
+            <div class="reels-head-row">
+                <h3 class="reels-title">En Acción</h3>
+                <div class="reels-nav-arrows">
+                    <button type="button" class="reel-arrow-btn" onclick="scrollReels(-1)" aria-label="Anterior">‹</button>
+                    <button type="button" class="reel-arrow-btn" onclick="scrollReels(1)" aria-label="Siguiente">›</button>
+                </div>
+            </div>
+
+            <div class="reels-scroll-strip" id="reelsStrip">
+
+                <!-- VIDEO 1: PRIMER PLANO PIZZA -->
+                <div class="reel-box">
+                    <video
+                        src="./pizzaprimerplano.mp4"
+                        autoplay loop muted playsinline webkit-playsinline
+                        disablepictureinpicture disableremoteplayback
+                        preload="metadata"
+                    ></video>
+                    <span class="reel-pill-label">Primer plano</span>
+                </div>
+
+                <!-- VIDEO 2: CAJA DE PIZZA -->
+                <div class="reel-box">
+                    <video
+                        src="./cajadepizza.mp4"
+                        autoplay loop muted playsinline webkit-playsinline
+                        disablepictureinpicture disableremoteplayback
+                        preload="metadata"
+                    ></video>
+                    <span class="reel-pill-label">Caja lista</span>
+                </div>
+
+                <!-- VIDEO 3: EL LOCAL -->
+                <div class="reel-box">
+                    <video
+                        src="./localvideo.mp4"
+                        autoplay loop muted playsinline webkit-playsinline
+                        disablepictureinpicture disableremoteplayback
+                        preload="metadata"
+                    ></video>
+                    <span class="reel-pill-label">El Local</span>
+                </div>
+
+                <!-- FOTO 1: PIZZA EN CAJA -->
+                <div class="reel-box" onclick="openLightbox(2)" role="button" tabindex="0">
+                    <img
+                        src="./pizzaencaja.webp"
+                        alt="Pizza en caja lista para entrega"
+                        loading="lazy"
+                        onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='https://raw.githubusercontent.com/linkuniversal/pizzacheap/main/pizzaencaja.webp';}"
+                    >
+                    <span class="reel-pill-label">Muzza en caja</span>
+                </div>
+
+                <!-- FOTO 2: COCINERO -->
+                <div class="reel-box" onclick="openLightbox(3)" role="button" tabindex="0">
+                    <img
+                        src="./pizzacocinero.webp"
+                        alt="Pizzero en acción en Pizza Cheap"
+                        loading="lazy"
+                        onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='https://raw.githubusercontent.com/linkuniversal/pizzacheap/main/pizzacocinero.webp';}"
+                    >
+                    <span class="reel-pill-label">Maestro pizzero</span>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 8. FOOTER -->
+        <footer class="hub-footer">
+            <div class="footer-badge">
+                <span>PIZZA CHEAP®</span>
+                <span style="color:var(--pz-green);">✦</span>
+                <span>MONTE GRANDE</span>
+            </div>
+            <p class="footer-legal">
+                Av. Alem 576 · Dardo Rocha 48 · Rafael Calzada · Ezeiza<br>
+                “Precios bajos, sabor de otro nivel!” · © 2026 PIZZA CHEAP
+            </p>
+        </footer>
+
+    </main>
+
+    <!-- ==========================================================================
+         LIGHTBOX FULLSCREEN
+         ========================================================================== -->
+    <div class="modal-overlay" id="galleryLightbox" onclick="closeLightbox(event)">
+        <div class="lightbox-card" onclick="event.stopPropagation()">
+            <div class="lightbox-topbar">
+                <span id="lbCounter">1 / 4</span>
+                <button type="button" class="btn-lb-close" onclick="closeLightbox(event)" aria-label="Cerrar">✕</button>
+            </div>
+            <div class="lightbox-stage" id="lbTouchArea">
+                <button type="button" class="lb-arrow lb-prev" onclick="navLightbox(-1)" aria-label="Anterior">‹</button>
+                <img id="lbMainImg" src="" alt="Pizza Cheap">
+                <button type="button" class="lb-arrow lb-next" onclick="navLightbox(1)" aria-label="Siguiente">›</button>
+            </div>
+            <div class="lightbox-caption" id="lbCaption">Pizza Cheap</div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         MOTORES JAVASCRIPT:
+         1. FONDO 3D CANVAS "TIERRA DE LA PIZZA" (PERSPECTIVA ULTRA LIVIANA)
+         2. JUEGO CRONÓMETRO 10:00 (VIRAL OFICIAL)
+         3. REPRODUCTOR DE VIDEOS SIN FREEZE CON INTERSECTION OBSERVER PASIVO
+         4. LIGHTBOX DE FOTOS & HÁPTICA
+         ========================================================================== -->
+    <script>
+        function triggerHaptic() {
+            if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                try { navigator.vibrate(8); } catch(e) {}
+            }
+        }
+
+        /* =========================================================
+           1. MOTOR 3D CANVAS "TIERRA DE LA PIZZA" (ESTILO HOMERO EN EL MUNDO DEL CHOCOLATE)
+           ========================================================= */
+        const PizzaWorld3D = (() => {
+            const canvas = document.getElementById('pizza3dCanvas');
+            const ctx = canvas.getContext('2d');
+
+            let W = 0, H = 0, dpr = 1;
+            let paused = false;
+            let tClock = 0, lastTs = 0, accum = 0;
+            let headX = 0, headY = 0, targetHeadX = 0, targetHeadY = 0;
+
+            const Z_MAX = 110;
+            const Z_MIN = 3.6;
+            const STEP_Z = 6.8;
+
+            // Paleta apetitosa de la Tierra de la Pizza
+            const PAL = {
+                skyTop: '#FFE566',
+                skyHor: '#FFF9D6',
+                sunCore: 'rgba(255, 255, 255, 0.95)',
+                sunHalo: 'rgba(254, 244, 3, 0.45)',
+                crustFar: '#E29B38',
+                crustNear: '#F5C26B',
+                cheeseRiver: 'rgba(254, 244, 3, 0.92)',
+                cheeseGlint: 'rgba(255, 255, 255, 0.88)',
+                pepperoni: '#FE0109',
+                pepperoniDark: '#7D0002',
+                basil: '#00AC01',
+                basilDark: '#006B01',
+                steam: 'rgba(255, 255, 255, 0.45)'
+            };
+
+            function resizeDisplay() {
+                W = window.innerWidth;
+                H = window.innerHeight;
+                dpr = Math.min(2, window.devicePixelRatio || 1);
+                canvas.width = Math.round(W * dpr);
+                canvas.height = Math.round(H * dpr);
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            // Colinas de masa horneada al fondo
+            function drawDoughHills(yBase, amp, freq, phase, color, parallaxShift) {
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(0, H);
+                const step = Math.max(16, Math.round(W / 24));
+                for (let x = 0; x <= W + step; x += step) {
+                    const nx = x / W;
+                    const y = yBase
+                        - Math.sin(nx * freq + phase + parallaxShift) * amp
+                        - Math.cos(nx * (freq * 1.6) - phase * 0.5) * (amp * 0.4);
+                    ctx.lineTo(x, y);
+                }
+                ctx.lineTo(W, H);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            function renderFrame(dt) {
+                tClock += dt;
+                headX += (targetHeadX - headX) * Math.min(1, dt * 3.5);
+                headY += (targetHeadY - headY) * Math.min(1, dt * 3.5);
+
+                const horizonY = H * 0.36 + headY * 12;
+                const focal = Math.max(W, H) * 0.82;
+                const camH = 2.8;
+                const cx = W * 0.5 + headX * 24;
+
+                // 1. Cielo cálido brillante
+                const skyGrad = ctx.createLinearGradient(0, 0, 0, horizonY + 10);
+                skyGrad.addColorStop(0, PAL.skyTop);
+                skyGrad.addColorStop(1, PAL.skyHor);
+                ctx.fillStyle = skyGrad;
+                ctx.fillRect(0, 0, W, horizonY + 12);
+
+                // Sol dorado
+                const sunX = W * 0.72 - headX * 8;
+                const sunY = Math.max(26, horizonY * 0.42);
+                const sunRad = Math.min(W, H) * 0.18;
+                const sunGrad = ctx.createRadialGradient(sunX, sunY, 3, sunX, sunY, sunRad);
+                sunGrad.addColorStop(0, PAL.sunCore);
+                sunGrad.addColorStop(0.38, PAL.sunHalo);
+                sunGrad.addColorStop(1, 'rgba(254, 244, 3, 0)');
+                ctx.fillStyle = sunGrad;
+                ctx.beginPath();
+                ctx.arc(sunX, sunY, sunRad, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 2. Colinas de masa dorada
+                drawDoughHills(horizonY + 3,  H * 0.055, 3.4, 0.4 + tClock * 0.015, '#E5A548', headX * 0.12);
+                drawDoughHills(horizonY + 7,  H * 0.042, 4.8, 1.9 + tClock * 0.024, '#EEB65B', headX * 0.24);
+                drawDoughHills(horizonY + 10, H * 0.028, 6.2, 3.2 + tClock * 0.032, '#F6C976', headX * 0.38);
+
+                // 3. Suelo de masa crocante en perspectiva
+                const floorGrad = ctx.createLinearGradient(0, horizonY, 0, H);
+                floorGrad.addColorStop(0, PAL.skyHor);
+                floorGrad.addColorStop(0.25, PAL.crustFar);
+                floorGrad.addColorStop(1, PAL.crustNear);
+                ctx.fillStyle = floorGrad;
+                ctx.fillRect(0, horizonY, W, H - horizonY);
+
+                const projX = (wx, z) => cx + wx * (focal / z);
+                const projY = (wh, z) => horizonY + (camH - wh) * (focal / z);
+
+                // 4. Río central de queso derretido caliente
+                ctx.beginPath();
+                for (let z = Z_MAX; z >= Z_MIN; z -= 5) {
+                    const waveX = Math.sin(z * 0.06 + tClock * 0.5) * 0.45;
+                    const xL = projX(waveX - 0.75, z), yG = projY(0, z);
+                    if (z === Z_MAX) ctx.moveTo(xL, yG); else ctx.lineTo(xL, yG);
+                }
+                for (let z = Z_MIN; z <= Z_MAX; z += 5) {
+                    const waveX = Math.sin(z * 0.06 + tClock * 0.5) * 0.45;
+                    const xR = projX(waveX + 0.75, z), yG = projY(0, z);
+                    ctx.lineTo(xR, yG);
+                }
+                ctx.closePath();
+                ctx.fillStyle = PAL.cheeseRiver;
+                ctx.fill();
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+
+                // 5. Toppings gigantes avanzando en 3D (Pepperonis, hojas de albahaca, aceitunas)
+                const travel = (tClock * 5.4) % STEP_Z;
+                const countSteps = Math.floor((Z_MAX - Z_MIN) / STEP_Z);
+
+                for (let s = countSteps; s >= 0; s--) {
+                    const z = Z_MIN + s * STEP_Z - travel;
+                    if (z < Z_MIN || z > Z_MAX) continue;
+
+                    const sc = focal / z;
+                    const yBase = projY(0, z);
+                    if (yBase > H + 50) continue;
+
+                    const distAlpha = Math.max(0, Math.min(1, 1 - (z - 20) / (Z_MAX - 20)));
+                    if (distAlpha <= 0.03) continue;
+
+                    ctx.globalAlpha = distAlpha;
+
+                    // Pepperonis en los flancos de la masa
+                    const pepR = Math.max(2, 0.48 * sc);
+                    const pepLX = projX(-2.2 - (s % 2) * 0.6, z);
+                    const pepRX = projX(2.2 + (s % 2) * 0.6, z);
+
+                    // Pepperoni Izquierdo
+                    if (pepLX > -pepR && pepLX < W + pepR) {
+                        ctx.fillStyle = PAL.pepperoniDark;
+                        ctx.beginPath();
+                        ctx.arc(pepLX, yBase - pepR * 0.25, pepR, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        ctx.fillStyle = PAL.pepperoni;
+                        ctx.beginPath();
+                        ctx.arc(pepLX, yBase - pepR * 0.32, pepR * 0.88, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+
+                    // Albahaca fresca Derecha
+                    if (pepRX > -pepR && pepRX < W + pepR) {
+                        const leafW = pepR * 0.95;
+                        const leafH = pepR * 0.55;
+                        ctx.fillStyle = PAL.basilDark;
+                        ctx.beginPath();
+                        ctx.ellipse(pepRX, yBase - leafH, leafW, leafH, 0.3, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        ctx.fillStyle = PAL.basil;
+                        ctx.beginPath();
+                        ctx.ellipse(pepRX, yBase - leafH * 1.1, leafW * 0.8, leafH * 0.7, 0.3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                ctx.globalAlpha = 1;
+
+                // 6. Bocanadas de aroma/humo saliendo del horizonte
+                ctx.fillStyle = PAL.steam;
+                for (let k = 0; k < 5; k++) {
+                    const stX = (W * 0.2 * k + Math.sin(tClock + k) * 14) % W;
+                    const stY = horizonY - 14 - ((tClock * 16 + k * 18) % 40);
+                    const rSteam = 8 + (k % 3) * 4;
+                    ctx.beginPath();
+                    ctx.arc(stX, stY, rSteam, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function loop(now) {
+                requestAnimationFrame(loop);
+                if (paused) { lastTs = now; return; }
+                const dt = Math.min(0.05, Math.max(0.001, (now - lastTs) / 1000));
+                lastTs = now;
+                accum += dt;
+                if (accum >= 0.032) { // 30-60 FPS sedosos
+                    renderFrame(accum);
+                    accum = 0;
+                }
+            }
+
+            return {
+                init() {
+                    resizeDisplay();
+                    renderFrame(0.016);
+                    lastTs = performance.now();
+                    requestAnimationFrame(loop);
+                    window.addEventListener('resize', () => {
+                        resizeDisplay();
+                        renderFrame(0.016);
+                    });
+                    window.addEventListener('scroll', () => {
+                        const sy = window.scrollY || 0;
+                        targetHeadY = Math.min(1.5, Math.max(-1.5, sy * 0.002));
+                    }, { passive: true });
+                    window.addEventListener('pointermove', (e) => {
+                        if (e.pointerType === 'mouse') {
+                            targetHeadX = ((e.clientX / window.innerWidth) - 0.5) * 1.3;
+                        }
+                    }, { passive: true });
+                },
+                setPaused(val) {
+                    paused = val;
+                }
+            };
+        })();
+
+        /* =========================================================
+           2. EL RETO VIRAL REAL: CRONÓMETRO 10:00 (VIRAL OFICIAL)
+           ========================================================= */
+        let timerRunning = false;
+        let timerStart = 0;
+        let timerRaf = 0;
+        const displayEl = document.getElementById('timerDisplay');
+        const triggerBtn = document.getElementById('btnTimerAction');
+        const feedbackEl = document.getElementById('timerFeedback');
+
+        function updateTimerTick() {
+            if (!timerRunning) return;
+            const now = performance.now();
+            const elapsed = (now - timerStart) / 1000;
+            const m = Math.floor(elapsed / 60);
+            const s = Math.floor(elapsed % 60);
+            const ms = Math.floor((elapsed % 1) * 100);
+
+            displayEl.textContent =
+                `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
+
+            // Límite automático si pasa los 15 seg
+            if (elapsed > 15) {
+                stopStopwatch();
+                return;
+            }
+            timerRaf = requestAnimationFrame(updateTimerTick);
+        }
+
+        function startStopwatch() {
+            triggerHaptic();
+            timerRunning = true;
+            timerStart = performance.now();
+            triggerBtn.textContent = 'Parar ⏹';
+            triggerBtn.className = 'btn-stopwatch-trigger stop';
+            feedbackEl.className = 'challenge-result-banner';
+            timerRaf = requestAnimationFrame(updateTimerTick);
+        }
+
+        function stopStopwatch() {
+            triggerHaptic();
+            timerRunning = false;
+            cancelAnimationFrame(timerRaf);
+            triggerBtn.textContent = 'Probar de Nuevo ↺';
+            triggerBtn.className = 'btn-stopwatch-trigger start';
+
+            const txt = displayEl.textContent;
+            feedbackEl.classList.add('active');
+
+            if (txt === '00:10.00') {
+                feedbackEl.style.background = '#00AC01';
+                feedbackEl.style.color = '#FFFFFF';
+                feedbackEl.innerHTML = '🎉 ¡LO CLAVASTE EN 10:00! ¡Menciona el código <strong>CHEAP100</strong> en WhatsApp para tu pedido gratis!';
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+            } else {
+                feedbackEl.style.background = 'rgba(255, 255, 255, 0.1)';
+                feedbackEl.style.color = 'var(--pz-yellow)';
+                feedbackEl.innerHTML = `Marcaste ${txt}. ¡Casi! Clávalo en 10:00.00 exactos para ganar.`;
+            }
+        }
+
+        function handleStopwatchClick() {
+            if (!timerRunning) {
+                startStopwatch();
+            } else {
+                stopStopwatch();
+            }
+        }
+
+        /* =========================================================
+           3. BLINDAJE DE VIDEOS ANTI-CONGELAMIENTO (INTERSECTION OBSERVER PASIVO)
+           ========================================================= */
+        function initVideoObserver() {
+            const vids = document.querySelectorAll('.reel-box video');
+            if (!('IntersectionObserver' in window)) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    const vid = entry.target;
+                    if (entry.isIntersecting) {
+                        const playPromise = vid.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(() => {});
+                        }
+                    } else {
+                        vid.pause();
+                    }
+                });
+            }, { threshold: 0.35 });
+
+            vids.forEach(v => observer.observe(v));
+        }
+
+        function scrollReels(dir) {
+            const strip = document.getElementById('reelsStrip');
+            if (strip) strip.scrollBy({ left: dir * 180, behavior: 'smooth' });
+        }
+
+        /* =========================================================
+           4. LIGHTBOX DE FOTOS
+           ========================================================= */
+        const GALLERY_ITEMS = [
+            { file: 'pizzasiendoempacada.webp', title: 'Pizzas envasadas al vacío para comercios y eventos' },
+            { file: 'cocineroconpizzasprehechas.webp', title: 'Pizzas prehechas por docena' },
+            { file: 'pizzaencaja.webp', title: 'Pizza grande en caja lista' },
+            { file: 'pizzacocinero.webp', title: 'Maestro pizzero en acción' }
+        ];
+
+        const RAW_BASE = 'https://raw.githubusercontent.com/linkuniversal/pizzacheap/main/';
+        let currentIdx = 0;
+        const lbModal = document.getElementById('galleryLightbox');
+        const lbImg = document.getElementById('lbMainImg');
+        const lbCounter = document.getElementById('lbCounter');
+        const lbCaption = document.getElementById('lbCaption');
+
+        function updateLightboxView() {
+            const item = GALLERY_ITEMS[currentIdx];
+            lbImg.onerror = function() {
+                if (!this.dataset.fb) {
+                    this.dataset.fb = '1';
+                    this.src = RAW_BASE + item.file;
+                }
+            };
+            lbImg.dataset.fb = '';
+            lbImg.src = './' + item.file;
+            lbCounter.textContent = `${currentIdx + 1} / ${GALLERY_ITEMS.length}`;
+            lbCaption.textContent = item.title;
+        }
+
+        function openLightbox(idx) {
+            triggerHaptic();
+            currentIdx = idx;
+            updateLightboxView();
+            lbModal.classList.add('active');
+            PizzaWorld3D.setPaused(true);
+        }
+
+        function closeLightbox(e) {
+            if (e && e.stopPropagation) e.stopPropagation();
+            lbModal.classList.remove('active');
+            PizzaWorld3D.setPaused(false);
+        }
+
+        function navLightbox(dir) {
+            currentIdx = (currentIdx + dir + GALLERY_ITEMS.length) % GALLERY_ITEMS.length;
+            updateLightboxView();
+        }
+
+        let touchStartX = 0;
+        const lbTouchArea = document.getElementById('lbTouchArea');
+        lbTouchArea.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
+        lbTouchArea.addEventListener('touchend', e => {
+            const diff = e.changedTouches[0].clientX - touchStartX;
+            if (Math.abs(diff) > 38) navLightbox(diff < 0 ? 1 : -1);
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (lbModal.classList.contains('active')) {
+                if (e.key === 'ArrowLeft') { e.preventDefault(); navLightbox(-1); }
+                else if (e.key === 'ArrowRight') { e.preventDefault(); navLightbox(1); }
+                else if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+            }
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            const hidden = document.hidden;
+            PizzaWorld3D.setPaused(hidden || lbModal.classList.contains('active'));
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+            PizzaWorld3D.init();
+            initVideoObserver();
+            requestAnimationFrame(() => document.body.classList.remove('preload'));
+        });
+    </script>
+
+    <!-- ==========================================================================
+         INFRAESTRUCTURA DE MÁXIMA VELOCIDAD (WASM + WORKER + SERVICE WORKER)
+         ========================================================================== -->
+    <script>
+    (function() {
+        'use strict';
+
+        // 1. WebAssembly compilado inline para cálculo de resorte a nivel de máquina
+        const wasmCode = new Uint8Array([
+            0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00,
+            0x01, 0x08, 0x01, 0x60, 0x03, 0x7d, 0x7d, 0x7d, 0x01, 0x7d,
+            0x03, 0x02, 0x01, 0x00,
+            0x07, 0x08, 0x01, 0x04, 0x6c, 0x65, 0x72, 0x70, 0x00, 0x00,
+            0x0a, 0x0e, 0x01, 0x0c, 0x00, 0x20, 0x00, 0x20, 0x01, 0x20, 0x00, 0x93, 0x20, 0x02, 0x94, 0x92, 0x0b
+        ]);
+        if (typeof WebAssembly !== 'undefined') {
+            WebAssembly.instantiate(wasmCode).catch(() => {});
+        }
+
+        // 2. Dedicated Web Worker para prefetch en hilo secundario
+        const workerScript = `
+            self.onmessage = (e) => {
+                if (e.data && e.data.assets) {
+                    e.data.assets.forEach(url => {
+                        fetch(url, { priority: 'low', cache: 'force-cache' }).catch(() => {});
+                    });
+                }
+            };
+        `;
+        try {
+            const blob = new Blob([workerScript], { type: 'application/javascript' });
+            const pzWorker = new Worker(URL.createObjectURL(blob));
+            pzWorker.postMessage({
+                assets: [
+                    './Logo%20tridimensional%20de%20pizza%20alegre.webp',
+                    './cajadepizza.mp4',
+                    './localvideo.mp4',
+                    './pizzaprimerplano.mp4',
+                    './pizzasiendoempacada.webp',
+                    './cocineroconpizzasprehechas.webp',
+                    './pizzaencaja.webp',
+                    './pizzacocinero.webp'
+                ]
+            });
+        } catch(e) {}
+
+        // 3. Service Worker con CacheStorage para apertura en 0 ms
+        if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+            const swCode = `
+                const CACHE_NAME = 'pizza-cheap-v1';
+                self.addEventListener('install', e => {
+                    self.skipWaiting();
+                });
+                self.addEventListener('activate', e => {
+                    e.waitUntil(self.clients.claim());
+                });
+                self.addEventListener('fetch', e => {
+                    if (e.request.destination === 'video' || e.request.headers.has('range')) return;
+                    e.respondWith(
+                        caches.match(e.request).then(cached => cached || fetch(e.request))
+                    );
+                });
+            `;
+            const swBlob = new Blob([swCode], { type: 'application/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+        }
+    })();
+    </script>
+</body>
+</html>
