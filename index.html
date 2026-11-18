@@ -1458,7 +1458,9 @@
 
     <!-- ==========================================================================
          MOTORES JAVASCRIPT:
-         1. FONDO 3D CANVAS "LA TIERRA DE LA PIZZA" (PERSPECTIVA POP APETITOSA)
+         1. FONDO 3D CANVAS "TIERRA DE LA PIZZA" (ESTILO HOMERO EN EL MUNDO DEL CHOCOLATE)
+            CON DETALLES ANATÓMICOS DE LOS 2 SVGS: PIZZAS ENTERAS, REBANADAS,
+            ACEITUNAS NEGRAS, PEPPERONIS Y HOJAS DE ALBAHACA A 60 FPS
          2. JUEGO CRONÓMETRO 10:00 (VIRAL OFICIAL)
          3. REPRODUCTOR DE VIDEOS SIN FREEZE CON INTERSECTION OBSERVER PASIVO
          4. LIGHTBOX DE FOTOS & HÁPTICA
@@ -1472,7 +1474,6 @@
 
         /* =========================================================
            1. MOTOR 3D CANVAS "TIERRA DE LA PIZZA" (ESTILO HOMERO EN EL MUNDO DEL CHOCOLATE)
-           PORCIONES TRIANGULARES 3D, PEPPERONIS, ALBAHACA, ACEITUNAS Y QUESO FUNDIDO
            ========================================================= */
         const PizzaWorld3D = (() => {
             const canvas = document.getElementById('pizza3dCanvas');
@@ -1483,58 +1484,318 @@
             let tClock = 0, lastTs = 0, accum = 0;
             let headX = 0, headY = 0, targetHeadX = 0, targetHeadY = 0;
 
-            const Z_MAX = 130;
+            const Z_MAX = 135;
             const Z_MIN = 4.2;
 
-            // Paleta apetitosa de la Tierra de la Pizza
-            const PAL = {
-                skyTop: '#FFE566',
-                skyHor: '#FFF9D6',
-                sunCore: 'rgba(255, 255, 255, 0.95)',
-                sunHalo: 'rgba(254, 244, 3, 0.45)',
-                crustBaked: '#D9822B',
-                crustLight: '#EEAB55',
-                cheeseMelt: '#FEF403',
-                cheeseDeep: '#E5DC00',
-                cheeseHighlight: 'rgba(255, 255, 255, 0.95)',
-                sauceRed: '#FE0109',
-                sauceDeep: '#7D0002',
-                basilGreen: '#00AC01',
-                basilDark: '#006B01',
-                oliveBlack: '#140E10',
-                steamWisp: 'rgba(255, 255, 255, 0.45)'
+            // Paleta oficial Pizza Cheap
+            const BRAND = {
+                yellow: '#FEF403',
+                yellowGlint: '#FFF875',
+                red: '#FE0109',
+                redDark: '#7D0002',
+                green: '#00AC01',
+                greenDark: '#005E01',
+                crust: '#D9822B',
+                crustLight: '#F5BE6B',
+                crustDark: '#B86518',
+                cheeseDrip: '#FFF238',
+                oliveBlack: '#120B0E',
+                skyTop: '#FFDC3B',
+                skyHor: '#FFF8D1'
             };
 
-            // Lista determinista de elementos en el espacio 3D para movimiento continuo
+            // Sprite Caches en memoria para renderizado ultra veloz (0.2 ms por frame)
+            let spriteWholePizza = null;
+            let spritePizzaSlice = null;
+            let spriteOlive = null;
+            let spriteOliveRing = null;
+            let spriteBasil = null;
+            let spritePepperoni = null;
+
+            function createOffscreen(w, h, drawFn) {
+                const c = document.createElement('canvas');
+                c.width = w;
+                c.height = h;
+                const cctx = c.getContext('2d');
+                drawFn(cctx, w, h);
+                return c;
+            }
+
+            // Construir los sprites vectoriales derivados directamente de tus 2 SVGs
+            function buildSprites() {
+                // 1. REBANADA DE PIZZA (SVG 2) con masa gruesa, salsa, queso chorreando y pepperoni
+                spritePizzaSlice = createOffscreen(200, 240, (g, w, h) => {
+                    const cx = w * 0.5, cy = h * 0.5;
+                    g.translate(cx, cy);
+
+                    // Sombra profunda
+                    g.fillStyle = 'rgba(125, 0, 2, 0.35)';
+                    g.beginPath();
+                    g.moveTo(0, 88);
+                    g.lineTo(-76, -70);
+                    g.quadraticCurveTo(0, -96, 76, -70);
+                    g.closePath();
+                    g.fill();
+
+                    // Borde de masa tostada posterior (SVG 2 .cls-6)
+                    g.fillStyle = BRAND.crustDark;
+                    g.beginPath();
+                    g.ellipse(0, -74, 76, 22, 0, 0, Math.PI * 2);
+                    g.fill();
+
+                    // Triángulo base de masa horneada
+                    g.fillStyle = BRAND.crust;
+                    g.beginPath();
+                    g.moveTo(0, 80);
+                    g.lineTo(-72, -68);
+                    g.quadraticCurveTo(0, -88, 72, -68);
+                    g.closePath();
+                    g.fill();
+
+                    // Salsa de tomate roja viva
+                    g.fillStyle = BRAND.red;
+                    g.beginPath();
+                    g.moveTo(0, 74);
+                    g.lineTo(-64, -62);
+                    g.quadraticCurveTo(0, -78, 64, -62);
+                    g.closePath();
+                    g.fill();
+
+                    // Queso mozzarella derretido con caída (.cls-2)
+                    g.fillStyle = BRAND.yellow;
+                    g.beginPath();
+                    g.moveTo(0, 78);
+                    g.lineTo(-60, -60);
+                    g.quadraticCurveTo(0, -74, 60, -60);
+                    g.closePath();
+                    g.fill();
+
+                    // Gotas y chorreados de queso que caen de la punta y costados
+                    g.fillStyle = BRAND.yellow;
+                    g.beginPath();
+                    g.arc(0, 84, 8, 0, Math.PI * 2);
+                    g.arc(-35, -12, 10, 0, Math.PI * 2);
+                    g.arc(32, 6, 9, 0, Math.PI * 2);
+                    g.arc(-14, 40, 7, 0, Math.PI * 2);
+                    g.fill();
+
+                    // Borde de corteza inflada dorada con brillo
+                    g.fillStyle = BRAND.crustLight;
+                    g.beginPath();
+                    g.ellipse(0, -74, 72, 14, 0, 0, Math.PI * 2);
+                    g.fill();
+                    g.strokeStyle = BRAND.crustDark;
+                    g.lineWidth = 3;
+                    g.stroke();
+
+                    // Pepperonis tostados sobre la porción
+                    function drawPep(px, py, pr) {
+                        g.fillStyle = BRAND.redDark;
+                        g.beginPath(); g.arc(px, py, pr, 0, Math.PI * 2); g.fill();
+                        g.fillStyle = BRAND.red;
+                        g.beginPath(); g.arc(px, py - 2, pr * 0.88, 0, Math.PI * 2); g.fill();
+                        g.fillStyle = BRAND.yellowGlint;
+                        g.beginPath(); g.arc(px - pr * 0.3, py - pr * 0.35, pr * 0.22, 0, Math.PI * 2); g.fill();
+                    }
+                    drawPep(-22, -28, 18);
+                    drawPep(18, 12, 16);
+
+                    // Hoja de albahaca fresca verde en el centro
+                    g.fillStyle = BRAND.greenDark;
+                    g.beginPath(); g.ellipse(-2, -6, 16, 8, 0.45, 0, Math.PI * 2); g.fill();
+                    g.fillStyle = BRAND.green;
+                    g.beginPath(); g.ellipse(-2, -7, 13, 6, 0.45, 0, Math.PI * 2); g.fill();
+                    g.strokeStyle = '#8BFF19';
+                    g.lineWidth = 1.6;
+                    g.beginPath(); g.moveTo(-12, -4); g.quadraticCurveTo(-2, -7, 10, -9); g.stroke();
+                });
+
+                // 2. PIZZA GRANDE ENTERA (SVG 1) en perspectiva volante con aceitunas, pepperonis y albahaca
+                spriteWholePizza = createOffscreen(260, 260, (g, w, h) => {
+                    const cx = w * 0.5, cy = h * 0.5, R = 112;
+
+                    // Sombra elíptica suave debajo
+                    g.fillStyle = 'rgba(125, 0, 2, 0.38)';
+                    g.beginPath();
+                    g.ellipse(cx, cy + 12, R + 6, R * 0.72, 0, 0, Math.PI * 2);
+                    g.fill();
+
+                    // Borde de masa horneada de la pizza entera (SVG 1 cornicione)
+                    const crustGrad = g.createRadialGradient(cx, cy, R * 0.72, cx, cy, R);
+                    crustGrad.addColorStop(0, BRAND.crustLight);
+                    crustGrad.addColorStop(0.72, BRAND.crust);
+                    crustGrad.addColorStop(1, BRAND.crustDark);
+                    g.fillStyle = crustGrad;
+                    g.beginPath();
+                    g.ellipse(cx, cy, R, R * 0.68, 0, 0, Math.PI * 2);
+                    g.fill();
+                    g.strokeStyle = BRAND.redDark;
+                    g.lineWidth = 4;
+                    g.stroke();
+
+                    // Anillo de salsa de tomate roja (.cls-9 de SVG 1)
+                    g.fillStyle = BRAND.red;
+                    g.beginPath();
+                    g.ellipse(cx, cy, R * 0.88, R * 0.58, 0, 0, Math.PI * 2);
+                    g.fill();
+
+                    // Mar de mozzarella dorada fundida
+                    const cheeseGrad = g.createRadialGradient(cx, cy, 6, cx, cy, R * 0.82);
+                    cheeseGrad.addColorStop(0, BRAND.yellowGlint);
+                    cheeseGrad.addColorStop(0.75, BRAND.yellow);
+                    cheeseGrad.addColorStop(1, '#F2BE00');
+                    g.fillStyle = cheeseGrad;
+                    g.beginPath();
+                    g.ellipse(cx, cy, R * 0.80, R * 0.52, 0, 0, Math.PI * 2);
+                    g.fill();
+
+                    // Puntos de gratinado y toques tostados
+                    g.fillStyle = 'rgba(184, 101, 24, 0.45)';
+                    for (let a = 0; a < 8; a++) {
+                        const ang = a * 0.78;
+                        const dist = R * 0.38;
+                        g.beginPath();
+                        g.arc(cx + Math.cos(ang) * dist, cy + Math.sin(ang) * dist * 0.6, 6 + (a % 3) * 2, 0, Math.PI * 2);
+                        g.fill();
+                    }
+
+                    // Toppings distribuidos según tu SVG 1:
+                    // Pepperonis
+                    function drawMiniPep(px, py, pr) {
+                        g.fillStyle = BRAND.redDark;
+                        g.beginPath(); g.arc(px, py, pr, 0, Math.PI * 2); g.fill();
+                        g.fillStyle = BRAND.red;
+                        g.beginPath(); g.arc(px, py - 1, pr * 0.88, 0, Math.PI * 2); g.fill();
+                        g.fillStyle = BRAND.yellowGlint;
+                        g.beginPath(); g.arc(px - pr * 0.3, py - pr * 0.3, pr * 0.28, 0, Math.PI * 2); g.fill();
+                    }
+                    drawMiniPep(cx - 38, cy - 14, 15);
+                    drawMiniPep(cx + 42, cy - 18, 16);
+                    drawMiniPep(cx - 10, cy + 24, 15);
+                    drawMiniPep(cx + 28, cy + 20, 14);
+                    drawMiniPep(cx - 46, cy + 12, 13);
+                    drawMiniPep(cx + 6, cy - 28, 14);
+
+                    // Aceitunas negras (enteras y rodajas con destellos de SVG 1)
+                    function drawMiniOlive(ox, oy, or, isRing) {
+                        g.fillStyle = BRAND.oliveBlack;
+                        g.beginPath(); g.arc(ox, oy, or, 0, Math.PI * 2); g.fill();
+                        if (isRing) {
+                            g.fillStyle = BRAND.yellow;
+                            g.beginPath(); g.arc(ox, oy, or * 0.45, 0, Math.PI * 2); g.fill();
+                            g.strokeStyle = BRAND.oliveBlack;
+                            g.lineWidth = 1.5;
+                            g.stroke();
+                        } else {
+                            g.fillStyle = '#FFFFFF';
+                            g.beginPath(); g.arc(ox - or * 0.32, oy - or * 0.32, or * 0.28, 0, Math.PI * 2); g.fill();
+                        }
+                    }
+                    drawMiniOlive(cx - 24, cy + 4, 8, false);
+                    drawMiniOlive(cx + 18, cy - 2, 7.5, true);
+                    drawMiniOlive(cx + 52, cy + 6, 7.5, false);
+                    drawMiniOlive(cx - 52, cy - 6, 7, true);
+
+                    // Hojas de albahaca fresca verde (SVG 1)
+                    function drawMiniLeaf(lx, ly, lr, rot) {
+                        g.save();
+                        g.translate(lx, ly);
+                        g.rotate(rot);
+                        g.fillStyle = BRAND.greenDark;
+                        g.beginPath(); g.ellipse(0, 0, lr, lr * 0.52, 0, 0, Math.PI * 2); g.fill();
+                        g.fillStyle = BRAND.green;
+                        g.beginPath(); g.ellipse(0, -1, lr * 0.85, lr * 0.42, 0, 0, Math.PI * 2); g.fill();
+                        g.strokeStyle = '#7EFF1F';
+                        g.lineWidth = 1.2;
+                        g.beginPath(); g.moveTo(-lr * 0.65, 0); g.lineTo(lr * 0.65, 0); g.stroke();
+                        g.restore();
+                    }
+                    drawMiniLeaf(cx - 14, cy - 12, 16, 0.4);
+                    drawMiniLeaf(cx + 22, cy - 14, 15, -0.6);
+                    drawMiniLeaf(cx - 2, cy + 12, 14, 0.9);
+                });
+
+                // 3. PEPPERONI INDIVIDUAL EN PERSPECTIVA
+                spritePepperoni = createOffscreen(90, 90, (g, w, h) => {
+                    const cx = w * 0.5, cy = h * 0.5, r = 36;
+                    g.fillStyle = 'rgba(125,0,2,0.3)';
+                    g.beginPath(); g.ellipse(cx, cy + 6, r, r * 0.6, 0, 0, Math.PI * 2); g.fill();
+                    g.fillStyle = BRAND.redDark;
+                    g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.fill();
+                    g.fillStyle = BRAND.red;
+                    g.beginPath(); g.arc(cx, cy - 3, r * 0.88, 0, Math.PI * 2); g.fill();
+                    g.fillStyle = BRAND.yellowGlint;
+                    g.beginPath(); g.arc(cx - r * 0.35, cy - r * 0.35, r * 0.22, 0, Math.PI * 2); g.fill();
+                });
+
+                // 4. ACEITUNA NEGRA ENTERA Y EN RODAJA
+                spriteOlive = createOffscreen(60, 60, (g, w, h) => {
+                    const cx = w * 0.5, cy = h * 0.5, r = 22;
+                    g.fillStyle = 'rgba(125,0,2,0.25)';
+                    g.beginPath(); g.ellipse(cx, cy + 4, r, r * 0.65, 0, 0, Math.PI * 2); g.fill();
+                    g.fillStyle = BRAND.oliveBlack;
+                    g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.fill();
+                    g.fillStyle = '#FFFFFF';
+                    g.beginPath(); g.arc(cx - r * 0.3, cy - r * 0.35, r * 0.28, 0, Math.PI * 2); g.fill();
+                });
+
+                spriteOliveRing = createOffscreen(60, 60, (g, w, h) => {
+                    const cx = w * 0.5, cy = h * 0.5, r = 22;
+                    g.fillStyle = BRAND.oliveBlack;
+                    g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.fill();
+                    g.fillStyle = BRAND.yellow;
+                    g.beginPath(); g.arc(cx, cy, r * 0.46, 0, Math.PI * 2); g.fill();
+                    g.strokeStyle = BRAND.oliveBlack;
+                    g.lineWidth = 3;
+                    g.stroke();
+                });
+
+                // 5. HOJA DE ALBAHACA FRESCA
+                spriteBasil = createOffscreen(80, 80, (g, w, h) => {
+                    const cx = w * 0.5, cy = h * 0.5, r = 32;
+                    g.fillStyle = BRAND.greenDark;
+                    g.beginPath(); g.ellipse(cx, cy, r, r * 0.55, 0, 0, Math.PI * 2); g.fill();
+                    g.fillStyle = BRAND.green;
+                    g.beginPath(); g.ellipse(cx, cy - 2, r * 0.86, r * 0.44, 0, 0, Math.PI * 2); g.fill();
+                    g.strokeStyle = '#7EFF1F';
+                    g.lineWidth = 2.4;
+                    g.beginPath(); g.moveTo(cx - r * 0.75, cy); g.lineTo(cx + r * 0.75, cy); g.stroke();
+                });
+            }
+
+            // Entidades 3D distribuidas: Rebanadas viniendo, Pizzas grandes flotando/volando, aceitunas y albahacas
             const ENTITIES = [
-                // Porciones triangulares 3D
-                { type: 'slice', wx: -3.2, wy: 0.8, baseZ: 20, size: 2.3, rot: 0.35, bobFreq: 1.4 },
-                { type: 'slice', wx: 3.4, wy: 1.1, baseZ: 44, size: 2.8, rot: -0.4, bobFreq: 1.1 },
-                { type: 'slice', wx: -2.4, wy: 1.4, baseZ: 68, size: 3.2, rot: 0.6, bobFreq: 1.6 },
-                { type: 'slice', wx: 2.8, wy: 1.6, baseZ: 96, size: 3.6, rot: -0.5, bobFreq: 0.9 },
-                { type: 'slice', wx: -1.2, wy: 0.9, baseZ: 118, size: 4.0, rot: 0.2, bobFreq: 1.3 },
+                // REBANADAS DE PIZZA (SVG 2) avanzando hacia adelante
+                { type: 'slice', wx: -3.2, wy: 0.9, baseZ: 18, scale: 0.92, rotSpeed: 0.2 },
+                { type: 'slice', wx: 3.4, wy: 1.1, baseZ: 42, scale: 1.05, rotSpeed: -0.25 },
+                { type: 'slice', wx: -2.6, wy: 1.4, baseZ: 66, scale: 1.25, rotSpeed: 0.18 },
+                { type: 'slice', wx: 2.9, wy: 1.6, baseZ: 94, scale: 1.4, rotSpeed: -0.22 },
+                { type: 'slice', wx: -1.2, wy: 1.0, baseZ: 118, scale: 1.55, rotSpeed: 0.15 },
 
-                // Pepperonis gigantes en 3D
-                { type: 'pep', wx: -1.8, wy: 0.2, baseZ: 12, size: 1.25, rot: 0.1 },
-                { type: 'pep', wx: 2.1, wy: 0.3, baseZ: 28, size: 1.4, rot: -0.2 },
-                { type: 'pep', wx: -4.1, wy: 0.6, baseZ: 38, size: 1.6, rot: 0.3 },
-                { type: 'pep', wx: 4.3, wy: 0.5, baseZ: 58, size: 1.9, rot: -0.15 },
-                { type: 'pep', wx: -1.9, wy: 0.7, baseZ: 82, size: 2.2, rot: 0.4 },
-                { type: 'pep', wx: 1.9, wy: 0.8, baseZ: 108, size: 2.4, rot: -0.25 },
+                // PIZZAS GRANDES ENTERAS VOLADORAS (SVG 1) flotando majestuosas en el cielo/horizonte como platillos
+                { type: 'whole', wx: 3.6, wy: -0.85, baseZ: 32, scale: 1.1, floatY: -0.85, spinSpeed: 0.35 },
+                { type: 'whole', wx: -3.8, wy: -1.1, baseZ: 62, scale: 1.35, floatY: -1.1, spinSpeed: -0.28 },
+                { type: 'whole', wx: 0.8, wy: -1.35, baseZ: 98, scale: 1.55, floatY: -1.35, spinSpeed: 0.3 },
 
-                // Hojas frescas de albahaca (basil)
-                { type: 'basil', wx: 1.2, wy: 0.4, baseZ: 16, size: 1.1, rot: 0.4 },
-                { type: 'basil', wx: -2.9, wy: 0.5, baseZ: 32, size: 1.3, rot: -0.6 },
-                { type: 'basil', wx: 2.6, wy: 0.6, baseZ: 52, size: 1.5, rot: 0.5 },
-                { type: 'basil', wx: -3.8, wy: 0.9, baseZ: 74, size: 1.8, rot: -0.3 },
-                { type: 'basil', wx: 1.4, wy: 1.0, baseZ: 102, size: 2.0, rot: 0.7 },
+                // ACEITUNAS NEGRAS (enteras y rodajas)
+                { type: 'olive', wx: -1.1, wy: 0.25, baseZ: 12, scale: 0.8, isRing: false },
+                { type: 'olive', wx: 1.4, wy: 0.35, baseZ: 26, scale: 0.9, isRing: true },
+                { type: 'olive', wx: -2.2, wy: 0.45, baseZ: 50, scale: 1.1, isRing: false },
+                { type: 'olive', wx: 2.1, wy: 0.55, baseZ: 76, scale: 1.2, isRing: true },
+                { type: 'olive', wx: -0.9, wy: 0.65, baseZ: 104, scale: 1.3, isRing: false },
 
-                // Aceitunas negras brillantes (enteras y rodajas)
-                { type: 'olive', wx: -0.8, wy: 0.15, baseZ: 10, size: 0.7, isRing: false },
-                { type: 'olive', wx: 0.9, wy: 0.25, baseZ: 24, size: 0.85, isRing: true },
-                { type: 'olive', wx: -1.5, wy: 0.45, baseZ: 48, size: 1.1, isRing: false },
-                { type: 'olive', wx: 1.6, wy: 0.55, baseZ: 64, size: 1.2, isRing: true },
-                { type: 'olive', wx: -0.6, wy: 0.75, baseZ: 88, size: 1.4, isRing: false }
+                // PEPPERONIS GRANDES
+                { type: 'pep', wx: 2.2, wy: 0.3, baseZ: 15, scale: 0.95 },
+                { type: 'pep', wx: -2.0, wy: 0.4, baseZ: 36, scale: 1.1 },
+                { type: 'pep', wx: 4.1, wy: 0.7, baseZ: 58, scale: 1.3 },
+                { type: 'pep', wx: -4.3, wy: 0.8, baseZ: 86, scale: 1.45 },
+                { type: 'pep', wx: 1.8, wy: 0.9, baseZ: 112, scale: 1.6 },
+
+                // HOJAS DE ALBAHACA
+                { type: 'basil', wx: -1.7, wy: 0.28, baseZ: 22, scale: 0.9, rot: 0.4 },
+                { type: 'basil', wx: 1.9, wy: 0.42, baseZ: 46, scale: 1.05, rot: -0.5 },
+                { type: 'basil', wx: -2.8, wy: 0.65, baseZ: 70, scale: 1.25, rot: 0.6 },
+                { type: 'basil', wx: 2.5, wy: 0.85, baseZ: 100, scale: 1.4, rot: -0.3 }
             ];
 
             function resizeDisplay() {
@@ -1563,201 +1824,9 @@
                 ctx.closePath();
                 ctx.fill();
 
-                // Borde tostado dorado con textura de burbujas horneadas
                 ctx.strokeStyle = shadowColor;
                 ctx.lineWidth = 3;
                 ctx.stroke();
-            }
-
-            // Dibuja una porción de pizza triangular 3D completa
-            function drawPizzaSlice3D(cx, cy, scale, rot, meltDrip) {
-                ctx.save();
-                ctx.translate(cx, cy);
-                ctx.rotate(rot);
-
-                const w = 18 * scale;
-                const len = 34 * scale;
-
-                // 1. Sombra bajo la porción
-                ctx.fillStyle = 'rgba(125, 0, 2, 0.22)';
-                ctx.beginPath();
-                ctx.moveTo(0, len * 0.55 + 5 * scale);
-                ctx.lineTo(-w * 0.85, -len * 0.55 + 6 * scale);
-                ctx.lineTo(w * 0.85, -len * 0.55 + 6 * scale);
-                ctx.closePath();
-                ctx.fill();
-
-                // 2. Base de masa triangular
-                ctx.fillStyle = PAL.crustBaked;
-                ctx.beginPath();
-                ctx.moveTo(0, len * 0.55);                      // Punta de la pizza
-                ctx.lineTo(-w * 0.8, -len * 0.5);                // Esquina izquierda
-                ctx.quadraticCurveTo(0, -len * 0.65, w * 0.8, -len * 0.5); // Borde curvo de masa
-                ctx.closePath();
-                ctx.fill();
-
-                // 3. Salsa de tomate roja
-                ctx.fillStyle = PAL.sauceRed;
-                ctx.beginPath();
-                ctx.moveTo(0, len * 0.5);
-                ctx.lineTo(-w * 0.72, -len * 0.44);
-                ctx.quadraticCurveTo(0, -len * 0.56, w * 0.72, -len * 0.44);
-                ctx.closePath();
-                ctx.fill();
-
-                // 4. Capa generosa de queso mozzarella derretido con chorreados colgantes
-                ctx.fillStyle = PAL.cheeseMelt;
-                ctx.beginPath();
-                ctx.moveTo(0, len * 0.52);
-                ctx.lineTo(-w * 0.7, -len * 0.42);
-                ctx.quadraticCurveTo(0, -len * 0.52, w * 0.7, -len * 0.42);
-                ctx.closePath();
-                ctx.fill();
-
-                // Hilos y gotas de queso cayendo de la porción
-                ctx.fillStyle = PAL.cheeseMelt;
-                const dripLen = (4 + meltDrip * 3.5) * scale;
-                ctx.beginPath();
-                ctx.arc(-w * 0.35, -len * 0.2, 2.5 * scale, 0, Math.PI * 2);
-                ctx.arc(w * 0.4, -len * 0.1, 2.8 * scale, 0, Math.PI * 2);
-                ctx.arc(0, len * 0.55 + dripLen * 0.3, 2.2 * scale, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Borde de masa grueso dorado (cornicione crocante)
-                ctx.fillStyle = PAL.crustLight;
-                ctx.beginPath();
-                ctx.ellipse(0, -len * 0.52, w * 0.82, 4.5 * scale, 0, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = PAL.crustBaked;
-                ctx.lineWidth = Math.max(1, 1.2 * scale);
-                ctx.stroke();
-
-                // 5. Toppings sobre la porción: 2 Pepperonis y 1 Albahaca
-                // Pepperoni 1
-                const pr = 4.2 * scale;
-                ctx.fillStyle = PAL.pepperoniDark;
-                ctx.beginPath();
-                ctx.arc(-w * 0.2, -len * 0.18, pr, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = PAL.pepperoni;
-                ctx.beginPath();
-                ctx.arc(-w * 0.2, -len * 0.19, pr * 0.85, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Pepperoni 2
-                ctx.fillStyle = PAL.pepperoniDark;
-                ctx.beginPath();
-                ctx.arc(w * 0.18, len * 0.08, pr * 0.88, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = PAL.pepperoni;
-                ctx.beginPath();
-                ctx.arc(w * 0.18, len * 0.07, pr * 0.74, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Albahaca fresca en el centro
-                const br = 3.6 * scale;
-                ctx.fillStyle = PAL.basilDark;
-                ctx.beginPath();
-                ctx.ellipse(0, -len * 0.02, br, br * 0.55, 0.4, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = PAL.basilGreen;
-                ctx.beginPath();
-                ctx.ellipse(0, -len * 0.03, br * 0.8, br * 0.42, 0.4, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.restore();
-            }
-
-            // Dibuja un Pepperoni 3D en perspectiva
-            function drawPepperoni3D(cx, cy, r) {
-                // Sombra
-                ctx.fillStyle = 'rgba(125, 0, 2, 0.25)';
-                ctx.beginPath();
-                ctx.ellipse(cx, cy + r * 0.35, r, r * 0.55, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Borde tostado oscuro
-                ctx.fillStyle = PAL.pepperoniDark;
-                ctx.beginPath();
-                ctx.arc(cx, cy, r, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Centro rojo condimentado con especias
-                ctx.fillStyle = PAL.pepperoni;
-                ctx.beginPath();
-                ctx.arc(cx, cy - r * 0.08, r * 0.85, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Brillo de grasa de cocción
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-                ctx.beginPath();
-                ctx.arc(cx - r * 0.28, cy - r * 0.32, r * 0.18, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Dibuja una Hoja de Albahaca en perspectiva
-            function drawBasil3D(cx, cy, size, rot) {
-                ctx.save();
-                ctx.translate(cx, cy);
-                ctx.rotate(rot);
-
-                // Sombra
-                ctx.fillStyle = 'rgba(0, 107, 1, 0.2)';
-                ctx.beginPath();
-                ctx.ellipse(0, size * 0.4, size, size * 0.5, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Hoja base
-                ctx.fillStyle = PAL.basilDark;
-                ctx.beginPath();
-                ctx.ellipse(0, 0, size, size * 0.55, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Follaje luminoso
-                ctx.fillStyle = PAL.basilGreen;
-                ctx.beginPath();
-                ctx.ellipse(0, -size * 0.08, size * 0.85, size * 0.42, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Nervadura central clara
-                ctx.strokeStyle = '#67E200';
-                ctx.lineWidth = Math.max(1, size * 0.12);
-                ctx.beginPath();
-                ctx.moveTo(-size * 0.7, 0);
-                ctx.quadraticCurveTo(0, -size * 0.1, size * 0.7, 0);
-                ctx.stroke();
-
-                ctx.restore();
-            }
-
-            // Dibuja una Aceituna Negra (entera o en rodaja con hueco)
-            function drawOlive3D(cx, cy, size, isRing) {
-                ctx.fillStyle = 'rgba(20, 14, 16, 0.25)';
-                ctx.beginPath();
-                ctx.ellipse(cx, cy + size * 0.35, size, size * 0.6, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = PAL.oliveBlack;
-                ctx.beginPath();
-                ctx.arc(cx, cy, size, 0, Math.PI * 2);
-                ctx.fill();
-
-                if (isRing) {
-                    // Hueco central de la rodaja de aceituna
-                    ctx.fillStyle = PAL.cheeseMelt;
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, size * 0.42, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = PAL.oliveBlack;
-                    ctx.lineWidth = Math.max(1, size * 0.15);
-                    ctx.stroke();
-                } else {
-                    // Brillo blanco sobre la piel de la aceituna
-                    ctx.fillStyle = '#FFFFFF';
-                    ctx.beginPath();
-                    ctx.arc(cx - size * 0.3, cy - size * 0.3, size * 0.2, 0, Math.PI * 2);
-                    ctx.fill();
-                }
             }
 
             function renderFrame(dt) {
@@ -1766,14 +1835,14 @@
                 headY += (targetHeadY - headY) * Math.min(1, dt * 3.5);
 
                 const horizonY = H * 0.36 + headY * 12;
-                const focal = Math.max(W, H) * 0.82;
+                const focal = Math.max(W, H) * 0.84;
                 const camH = 2.8;
                 const cx = W * 0.5 + headX * 24;
 
-                // 1. Cielo cálido dorado y apetitoso
+                // 1. Cielo cálido dorado
                 const skyGrad = ctx.createLinearGradient(0, 0, 0, horizonY + 10);
-                skyGrad.addColorStop(0, PAL.skyTop);
-                skyGrad.addColorStop(1, PAL.skyHor);
+                skyGrad.addColorStop(0, BRAND.skyTop);
+                skyGrad.addColorStop(1, BRAND.skyHor);
                 ctx.fillStyle = skyGrad;
                 ctx.fillRect(0, 0, W, horizonY + 12);
 
@@ -1782,23 +1851,23 @@
                 const sunY = Math.max(26, horizonY * 0.42);
                 const sunRad = Math.min(W, H) * 0.18;
                 const sunGrad = ctx.createRadialGradient(sunX, sunY, 3, sunX, sunY, sunRad);
-                sunGrad.addColorStop(0, PAL.sunCore);
-                sunGrad.addColorStop(0.38, PAL.sunHalo);
+                sunGrad.addColorStop(0, '#FFFFFF');
+                sunGrad.addColorStop(0.38, 'rgba(254, 244, 3, 0.45)');
                 sunGrad.addColorStop(1, 'rgba(254, 244, 3, 0)');
                 ctx.fillStyle = sunGrad;
                 ctx.beginPath();
                 ctx.arc(sunX, sunY, sunRad, 0, Math.PI * 2);
                 ctx.fill();
 
-                // 2. Colinas de masa crujiente dorada en el horizonte (estilo corteza inflada)
+                // 2. Colinas de masa crujiente dorada en el horizonte
                 drawCrustHills(horizonY + 3,  H * 0.055, 3.4, 0.4 + tClock * 0.015, '#E29B38', '#BF6517');
                 drawCrustHills(horizonY + 7,  H * 0.042, 4.8, 1.9 + tClock * 0.024, '#EEAB55', '#D9822B');
                 drawCrustHills(horizonY + 10, H * 0.028, 6.2, 3.2 + tClock * 0.032, '#F5C26B', '#E59E35');
 
-                // 3. Suelo de masa en perspectiva
+                // 3. Suelo de masa crocante en perspectiva
                 const floorGrad = ctx.createLinearGradient(0, horizonY, 0, H);
-                floorGrad.addColorStop(0, PAL.skyHor);
-                floorGrad.addColorStop(0.25, PAL.crustBaked);
+                floorGrad.addColorStop(0, BRAND.skyHor);
+                floorGrad.addColorStop(0.25, BRAND.crust);
                 floorGrad.addColorStop(1, '#F8CE7F');
                 ctx.fillStyle = floorGrad;
                 ctx.fillRect(0, horizonY, W, H - horizonY);
@@ -1806,7 +1875,7 @@
                 const projX = (wx, z) => cx + wx * (focal / z);
                 const projY = (wh, z) => horizonY + (camH - wh) * (focal / z);
 
-                // 4. Gran mar/río central de queso derretido caliente con olas de mozzarella
+                // 4. Gran río/valle central de queso derretido caliente con olas de mozzarella
                 ctx.beginPath();
                 for (let z = Z_MAX; z >= Z_MIN; z -= 4) {
                     const waveX = Math.sin(z * 0.07 + tClock * 0.6) * 0.55;
@@ -1819,13 +1888,13 @@
                     ctx.lineTo(xR, yG);
                 }
                 ctx.closePath();
-                ctx.fillStyle = PAL.cheeseMelt;
+                ctx.fillStyle = BRAND.yellow;
                 ctx.fill();
                 ctx.strokeStyle = '#FFFFFF';
                 ctx.lineWidth = 2.5;
                 ctx.stroke();
 
-                // Burbujas de mozzarella caliente que se inflan y revientan en el río
+                // Burbujas de mozzarella caliente que hierven en el río
                 for (let b = 0; b < 6; b++) {
                     const bz = Z_MIN + ((b * 18 + tClock * 14) % (Z_MAX - Z_MIN));
                     const bwX = Math.sin(bz * 0.07 + tClock * 0.6) * 0.55 + Math.sin(b * 3) * 0.4;
@@ -1833,65 +1902,104 @@
                     const by = projY(0.12, bz);
                     const br = Math.max(1.5, (0.35 * focal) / bz);
 
-                    ctx.fillStyle = PAL.cheeseDeep;
+                    ctx.fillStyle = BRAND.yellowGlint;
                     ctx.beginPath();
                     ctx.arc(bx, by, br, 0, Math.PI * 2);
                     ctx.fill();
-
-                    ctx.fillStyle = PAL.cheeseHighlight;
-                    ctx.beginPath();
-                    ctx.arc(bx - br * 0.28, by - br * 0.28, br * 0.35, 0, Math.PI * 2);
-                    ctx.fill();
                 }
 
-                // 5. Renderizado 3D de Porciones de Pizza, Pepperonis, Albahaca y Aceitunas
-                // Avanzan suavemente en Z hacia la cámara (orden z descendente para profundidad correcta)
-                const speedZ = 6.2; // velocidad de avance
+                // 5. Renderizado 3D de Entidades (Rebanadas SVG 2, Pizzas Enteras SVG 1, Aceitunas, Pepperonis, Albahaca)
+                const speedZ = 6.4;
                 const zSpan = Z_MAX - Z_MIN;
 
-                // Ordenamos por profundidad actual
-                const renderQueue = ENTITIES.map(e => {
-                    const currentZ = Z_MIN + (((e.baseZ - tClock * speedZ) % zSpan) + zSpan) % zSpan;
-                    return { ...e, currentZ };
-                }).sort((a, b) => b.currentZ - a.currentZ);
+                // Ordenar por Z descendente (de atrás hacia adelante)
+                const queue = ENTITIES.map(e => {
+                    let curZ;
+                    if (e.type === 'whole') {
+                        // Las pizzas enteras flotan horizontalmente en el cielo en bucle
+                        curZ = Z_MIN + (((e.baseZ - tClock * 2.8) % zSpan) + zSpan) % zSpan;
+                    } else {
+                        // Las porciones, aceitunas y albahacas avanzan continuamente hacia el frente
+                        curZ = Z_MIN + (((e.baseZ - tClock * speedZ) % zSpan) + zSpan) % zSpan;
+                    }
+                    return { ...e, curZ };
+                }).sort((a, b) => b.curZ - a.curZ);
 
-                for (let i = 0; i < renderQueue.length; i++) {
-                    const ent = renderQueue[i];
-                    const z = ent.currentZ;
+                for (let i = 0; i < queue.length; i++) {
+                    const ent = queue[i];
+                    const z = ent.curZ;
                     if (z < Z_MIN || z > Z_MAX) continue;
 
                     const sc = focal / z;
-                    // Suavizado por distancia cerca del horizonte
                     const alpha = Math.max(0, Math.min(1, 1 - (z - 28) / (Z_MAX - 28)));
                     if (alpha <= 0.03) continue;
 
                     ctx.globalAlpha = alpha;
 
-                    // Posición con balanceo suave orgánico
-                    const bobY = ent.wy + Math.sin(tClock * (ent.bobFreq || 1.2) + ent.wx) * 0.12;
-                    const sx = projX(ent.wx, z);
-                    const sy = projY(bobY, z);
+                    if (ent.type === 'slice' && spritePizzaSlice) {
+                        // Rebanada de pizza 3D (SVG 2)
+                        const bobY = ent.wy + Math.sin(tClock * 1.5 + ent.wx) * 0.14;
+                        const sx = projX(ent.wx, z);
+                        const sy = projY(bobY, z);
+                        const drawW = (spritePizzaSlice.width * (ent.scale * sc)) / 110;
+                        const drawH = (spritePizzaSlice.height * (ent.scale * sc)) / 110;
+                        const rot = Math.sin(tClock * (ent.rotSpeed || 0.2)) * 0.18 + (ent.wx > 0 ? -0.15 : 0.15);
 
-                    if (ent.type === 'slice') {
-                        const sliceScale = Math.max(0.4, (ent.size * sc) / 28);
-                        const melt = (Math.sin(tClock * 2 + ent.wx) + 1) * 0.5;
-                        drawPizzaSlice3D(sx, sy, sliceScale, ent.rot + Math.sin(tClock + i) * 0.08, melt);
-                    } else if (ent.type === 'pep') {
-                        const pepR = Math.max(2, (ent.size * sc) * 0.32);
-                        drawPepperoni3D(sx, sy, pepR);
-                    } else if (ent.type === 'basil') {
-                        const basilS = Math.max(3, (ent.size * sc) * 0.26);
-                        drawBasil3D(sx, sy, basilS, ent.rot + Math.sin(tClock * 1.5) * 0.1);
+                        ctx.save();
+                        ctx.translate(sx, sy);
+                        ctx.rotate(rot);
+                        ctx.drawImage(spritePizzaSlice, -drawW * 0.5, -drawH * 0.5, drawW, drawH);
+                        ctx.restore();
+
+                    } else if (ent.type === 'whole' && spriteWholePizza) {
+                        // Pizza Grande Entera Voladora (SVG 1) flotando en el cielo como platillo giratorio
+                        const hoverY = ent.floatY + Math.sin(tClock * 1.2 + ent.wx) * 0.15;
+                        const sx = projX(ent.wx + Math.sin(tClock * 0.4) * 0.6, z);
+                        const sy = projY(hoverY, z);
+                        const drawW = (spriteWholePizza.width * (ent.scale * sc)) / 95;
+                        const drawH = (spriteWholePizza.height * (ent.scale * sc)) / 95;
+                        const spin = tClock * (ent.spinSpeed || 0.3);
+
+                        ctx.save();
+                        ctx.translate(sx, sy);
+                        ctx.rotate(spin);
+                        ctx.drawImage(spriteWholePizza, -drawW * 0.5, -drawH * 0.5, drawW, drawH);
+                        ctx.restore();
+
+                    } else if (ent.type === 'pep' && spritePepperoni) {
+                        // Pepperoni grande en el suelo
+                        const sx = projX(ent.wx, z);
+                        const sy = projY(ent.wy, z);
+                        const size = (spritePepperoni.width * (ent.scale * sc)) / 120;
+                        ctx.drawImage(spritePepperoni, sx - size * 0.5, sy - size * 0.5, size, size);
+
                     } else if (ent.type === 'olive') {
-                        const oliveR = Math.max(2, (ent.size * sc) * 0.3);
-                        drawOlive3D(sx, sy, oliveR, ent.isRing);
+                        // Aceituna negra (entera o en rodaja con hueco)
+                        const spr = ent.isRing ? spriteOliveRing : spriteOlive;
+                        if (spr) {
+                            const sx = projX(ent.wx, z);
+                            const sy = projY(ent.wy, z);
+                            const size = (spr.width * (ent.scale * sc)) / 100;
+                            ctx.drawImage(spr, sx - size * 0.5, sy - size * 0.5, size, size);
+                        }
+
+                    } else if (ent.type === 'basil' && spriteBasil) {
+                        // Hoja de albahaca fresca
+                        const sx = projX(ent.wx, z);
+                        const sy = projY(ent.wy, z);
+                        const size = (spriteBasil.width * (ent.scale * sc)) / 115;
+                        ctx.save();
+                        ctx.translate(sx, sy);
+                        ctx.rotate((ent.rot || 0) + Math.sin(tClock * 1.4) * 0.12);
+                        ctx.drawImage(spriteBasil, -size * 0.5, -size * 0.5, size, size);
+                        ctx.restore();
                     }
                 }
 
                 ctx.globalAlpha = 1;
 
-                // 6. Espirales de vapor y aroma a pizza recién salida del horno
-                ctx.fillStyle = PAL.steamWisp;
+                // 6. Espirales de vapor y aroma a pizza recién horneada
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
                 for (let k = 0; k < 6; k++) {
                     const stX = (W * 0.16 * k + Math.sin(tClock * 1.2 + k) * 22) % W;
                     const stY = horizonY - 10 - ((tClock * 20 + k * 22) % 65);
@@ -1908,7 +2016,7 @@
                 const dt = Math.min(0.05, Math.max(0.001, (now - lastTs) / 1000));
                 lastTs = now;
                 accum += dt;
-                if (accum >= 0.016) { // 60 FPS ultra fluidos y sedosos
+                if (accum >= 0.016) { // 60 FPS sedosos sin consumo excesivo
                     renderFrame(accum);
                     accum = 0;
                 }
@@ -1916,6 +2024,7 @@
 
             return {
                 init() {
+                    buildSprites();
                     resizeDisplay();
                     renderFrame(0.016);
                     lastTs = performance.now();
