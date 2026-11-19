@@ -1287,7 +1287,7 @@
                 </div>
             </div>
 
-            <a href="https://wa.me/message/FYULREP6X5UFI1?text=%C2%A1Hola!%20Quisiera%20consultar%20por%20las%20pizzas%20envasadas%20al%20vac%C3%ADo%20por%20docena%20para%20comercios%20o%20eventos." target="_blank" rel="noopener noreferrer" class="btn-wholesale-order" onclick="triggerHaptic()">
+            <a href="https://wa.me/5491141872756?text=%C2%A1Hola!%20Quisiera%20consultar%20por%20las%20pizzas%20envasadas%20al%20vac%C3%ADo%20por%20docena%20para%20comercios%20o%20eventos." target="_blank" rel="noopener noreferrer" class="btn-wholesale-order" onclick="triggerHaptic()">
                 <span>Consultar Precios por Docena</span>
                 <span>Pedir Info ↗</span>
             </a>
@@ -1368,10 +1368,11 @@
                 <!-- VIDEO 1: PRIMER PLANO PIZZA -->
                 <div class="reel-box">
                     <video
-                        src="./pizzaprimerplano.mp4"
+                        src="./pizzaprimerplano.mp4#t=0.1"
+                        data-fb="https://raw.githubusercontent.com/linkuniversal/pizzacheap/main/pizzaprimerplano.mp4#t=0.1"
                         autoplay loop muted playsinline webkit-playsinline
                         disablepictureinpicture disableremoteplayback
-                        preload="metadata"
+                        preload="auto"
                     ></video>
                     <span class="reel-pill-label">Nuestras pizzas</span>
                 </div>
@@ -1379,10 +1380,11 @@
                 <!-- VIDEO 2: CAJA DE PIZZA -->
                 <div class="reel-box">
                     <video
-                        src="./cajadepizza.mp4"
+                        src="./cajadepizza.mp4#t=0.1"
+                        data-fb="https://raw.githubusercontent.com/linkuniversal/pizzacheap/main/cajadepizza.mp4#t=0.1"
                         autoplay loop muted playsinline webkit-playsinline
                         disablepictureinpicture disableremoteplayback
-                        preload="metadata"
+                        preload="auto"
                     ></video>
                     <span class="reel-pill-label">Caja lista</span>
                 </div>
@@ -1390,10 +1392,11 @@
                 <!-- VIDEO 3: EL LOCAL -->
                 <div class="reel-box">
                     <video
-                        src="./localvideo.mp4"
+                        src="./localvideo.mp4#t=0.1"
+                        data-fb="https://raw.githubusercontent.com/linkuniversal/pizzacheap/main/localvideo.mp4#t=0.1"
                         autoplay loop muted playsinline webkit-playsinline
                         disablepictureinpicture disableremoteplayback
-                        preload="metadata"
+                        preload="auto"
                     ></video>
                     <span class="reel-pill-label">El Local</span>
                 </div>
@@ -2118,25 +2121,55 @@
         }
 
         /* =========================================================
-           3. BLINDAJE DE VIDEOS ANTI-CONGELAMIENTO (INTERSECTION OBSERVER PASIVO)
+           3. BLINDAJE DE VIDEOS ANTI-CONGELAMIENTO (IPHONE SAFARI + INTERSECTION OBSERVER)
            ========================================================= */
         function initVideoObserver() {
             const vids = document.querySelectorAll('.reel-box video');
-            if (!('IntersectionObserver' in window)) return;
+            const tryPlay = (vid) => {
+                if (!vid) return;
+                vid.defaultMuted = true;
+                vid.muted = true;
+                const playPromise = vid.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(() => {});
+                }
+            };
+
+            vids.forEach(v => {
+                v.defaultMuted = true;
+                v.muted = true;
+                v.setAttribute('muted', '');
+                v.addEventListener('error', () => {
+                    if (!v.dataset.fbUsed && v.dataset.fb) {
+                        v.dataset.fbUsed = '1';
+                        v.src = v.dataset.fb;
+                        v.load();
+                    }
+                });
+                const onReady = () => {
+                    if (v.dataset.inView === '1') tryPlay(v);
+                };
+                v.addEventListener('loadeddata', onReady);
+                v.addEventListener('canplay', onReady);
+            });
+
+            if (!('IntersectionObserver' in window)) {
+                vids.forEach(v => { v.dataset.inView = '1'; tryPlay(v); });
+                return;
+            }
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach((entry) => {
                     const vid = entry.target;
                     if (entry.isIntersecting) {
-                        const playPromise = vid.play();
-                        if (playPromise !== undefined) {
-                            playPromise.catch(() => {});
-                        }
+                        vid.dataset.inView = '1';
+                        tryPlay(vid);
                     } else {
+                        vid.dataset.inView = '0';
                         vid.pause();
                     }
                 });
-            }, { threshold: 0.35 });
+            }, { threshold: 0.25 });
 
             vids.forEach(v => observer.observe(v));
         }
@@ -2244,7 +2277,7 @@
             WebAssembly.instantiate(wasmCode).catch(() => {});
         }
 
-        // 2. Dedicated Web Worker para prefetch en hilo secundario
+        // 2. Dedicated Web Worker para prefetch en hilo secundario (solo imágenes .webp para no saturar streaming de videos en iOS)
         const workerScript = `
             self.onmessage = (e) => {
                 if (e.data && e.data.assets) {
@@ -2260,9 +2293,6 @@
             pzWorker.postMessage({
                 assets: [
                     './Logo%20tridimensional%20de%20pizza%20alegre.webp',
-                    './cajadepizza.mp4',
-                    './localvideo.mp4',
-                    './pizzaprimerplano.mp4',
                     './pizzasiendoempacada.webp',
                     './cocineroconpizzasprehechas.webp',
                     './pizzaencaja.webp',
@@ -2274,7 +2304,7 @@
         // 3. Service Worker con CacheStorage para apertura en 0 ms
         if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
             const swCode = `
-                const CACHE_NAME = 'pizza-cheap-v1';
+                const CACHE_NAME = 'pizza-cheap-v2';
                 self.addEventListener('install', e => {
                     self.skipWaiting();
                 });
